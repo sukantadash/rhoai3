@@ -1,0 +1,14 @@
+# Update endpoint (FQDN only) and targetModel to match your OpenAI-compatible provider.
+apiVersion: maas.opendatahub.io/v1alpha1
+kind: ExternalModel
+metadata:
+  name: my-external-model
+  namespace: ai-models
+spec:
+  provider: openai
+#  endpoint: url(FQDN only, no trailing slash)
+#  targetModel: model-id  
+  endpoint: "maas-rhdp.apps.maas.redhatworkshops.io"
+  targetModel: "llama-scout-17b"
+  credentialRef:
+    name: external-model-credentials

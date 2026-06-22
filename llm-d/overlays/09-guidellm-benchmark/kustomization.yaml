@@ -1,0 +1,6 @@
+# LLMInferenceService deployments. Edit instances/llm-models/kustomization.yaml to switch models.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../instances/guidellm-benchmark

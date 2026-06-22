@@ -1,0 +1,57 @@
+apiVersion: datasciencecluster.opendatahub.io/v2
+kind: DataScienceCluster
+metadata:
+  labels:
+    app.kubernetes.io/name: datasciencecluster
+  name: default-dsc
+  namespace: redhat-ods-applications
+spec:
+  components:
+    kserve:
+      managementState: Managed
+      defaultDeploymentMode: RawDeployment  # Direct pod deployments without Knative
+      nim:
+        managementState: Managed  # Enable NVIDIA NIM (NVIDIA Inference Microservices) support
+      rawDeploymentServiceConfig: Headless  # Use headless services for raw deployments
+      serving:
+        ingressGateway:
+          certificate:
+            type: OpenshiftDefaultIngress  # Use OpenShift's default ingress certificate
+        managementState: Removed  # Disable Knative serving (incompatible with RawDeployment)
+        name: knative-serving
+      modelsAsService:
+        managementState: Managed
+    modelregistry:
+      managementState: Managed
+      registriesNamespace: rhoai-model-registries
+    feastoperator:
+      managementState: Removed
+    trustyai:
+      eval:
+        lmeval:
+          permitCodeExecution: deny
+          permitOnline: deny
+      managementState: Managed
+    aipipelines:
+      argoWorkflowsControllers:
+        managementState: Managed
+      managementState: Removed
+    ray:
+      managementState: Removed
+    kueue:
+      defaultClusterQueueName: default
+      defaultLocalQueueName: default
+      managementState: Removed
+    workbenches:
+      managementState: Managed
+      workbenchNamespace: rhods-notebooks
+    mlflowoperator:
+      managementState: Removed
+    dashboard:
+      managementState: Managed
+    trainer:
+      managementState: Removed
+    llamastackoperator:
+      managementState: Managed
+    trainingoperator:
+      managementState: Removed

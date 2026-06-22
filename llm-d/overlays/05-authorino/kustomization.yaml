@@ -1,0 +1,10 @@
+# Authorino for gateway authorization.
+# After applying, annotate the Authorino service for TLS:
+#   oc annotate svc/authorino-authorino-authorization \
+#     service.beta.openshift.io/serving-cert-secret-name=authorino-server-cert \
+#     -n kuadrant-system
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../instances/authorino

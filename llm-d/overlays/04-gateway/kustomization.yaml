@@ -1,0 +1,7 @@
+# GatewayClass, Gateway, and TLSPolicy for OpenShift AI inference.
+# Update gateway hostname and ClusterIssuer name before applying.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../instances/gateway

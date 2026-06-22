@@ -1,0 +1,8 @@
+# Apply after operators are ready: Service Mesh, Kuadrant, and Leader Worker Set instances.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../instances/servicemesh
+  - ../../instances/rhcl
+  - ../../instances/lead-worker-set

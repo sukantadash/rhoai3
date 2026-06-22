@@ -1,0 +1,12 @@
+# Enables User Workload Monitoring (UWM). Required for MaaS Usage dashboard metrics:
+# Kuadrant observability creates Limitador/Authorino monitors scraped by
+# prometheus-user-workload, federated to thanos-querier.openshift-monitoring,
+# which is the default Perses datasource (cluster-prometheus-datasource).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-monitoring-config
+  namespace: openshift-monitoring
+data:
+  config.yaml: |
+    enableUserWorkload: true

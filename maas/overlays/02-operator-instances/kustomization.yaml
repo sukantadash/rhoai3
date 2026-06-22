@@ -1,0 +1,11 @@
+# Apply after operators are ready: NFD instance and NVIDIA ClusterPolicy.
+# Wait for NFD and NVIDIA operators to be installed before applying.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base/instances/nfd
+  - ../../base/instances/nvidia
+  - ../../base/instances/lead-worker-set
+  - ../../base/instances/uwm
+  - ../../base/instances/rhcl

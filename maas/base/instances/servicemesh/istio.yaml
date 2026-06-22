@@ -1,0 +1,12 @@
+apiVersion: sailoperator.io/v1
+kind: Istio
+metadata:
+  name: default
+  namespace: istio-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  version: v1.27-latest
+  updateStrategy:
+    inactiveRevisionDeletionGracePeriodSeconds: 30
+    type: InPlace

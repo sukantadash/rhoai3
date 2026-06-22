@@ -1,0 +1,23 @@
+# Istio Gateway API infrastructure options for maas-default-gateway.
+# Kuadrant AuthPolicy/TokenRateLimitPolicy WASM filters exceed the default 1Gi
+# istio-proxy limit; without this the gateway controller resets manual patches.
+# Ref: https://istio.io/latest/docs/tasks/traffic-management/ingress/gateway-api/
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: maas-gateway-options
+  namespace: openshift-ingress
+data:
+  deployment: |
+    spec:
+      template:
+        spec:
+          containers:
+          - name: istio-proxy
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512Mi
+              limits:
+                cpu: "2"
+                memory: 4Gi

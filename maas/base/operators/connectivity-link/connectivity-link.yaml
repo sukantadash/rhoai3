@@ -1,0 +1,28 @@
+---
+# Red Hat Connectivity Link operator (installs in rh-connectivity-link per Red Hat docs).
+# Prerequisites: OpenShift Service Mesh 3.2 with Gateway API, cert-manager Operator.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rh-connectivity-link
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: kuadrant
+  namespace: rh-connectivity-link
+spec:
+  upgradeStrategy: Default
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: rhcl-operator
+  namespace: rh-connectivity-link
+spec:
+  channel: stable
+  installPlanApproval: Manual
+  name: rhcl-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  startingCSV: rhcl-operator.v1.3.3

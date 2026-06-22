@@ -1,0 +1,21 @@
+---
+# Enables Gen AI Studio (Playground) in the OpenShift AI dashboard.
+# The dashboard operator may create a default OdhDashboardConfig when the dashboard
+# component is deployed; applying this sets genAiStudio: true (create or merge).
+# If you need to only patch an existing config, use:
+#   oc patch odhdashboardconfig odh-dashboard-config -n redhat-ods-applications \
+#     --type=merge -p '{"spec":{"dashboardConfig":{"genAiStudio":true}}}'
+apiVersion: opendatahub.io/v1alpha
+kind: OdhDashboardConfig
+metadata:
+  name: odh-dashboard-config
+  namespace: redhat-ods-applications
+  labels:
+    app.kubernetes.io/part-of: rhods-dashboard
+    app.opendatahub.io/rhods-dashboard: "true"
+spec:
+  dashboardConfig:
+    modelAsService: true
+    genAiStudio: true
+    observabilityDashboard: true
+    vLLMDeploymentOnMaaS: true

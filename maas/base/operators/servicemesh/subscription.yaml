@@ -1,0 +1,16 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: servicemeshoperator3
+  namespace: openshift-operators
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+spec:
+  # stable-3.2 pins RHCL 1.4 supported OSM on standalone installs.
+  # On OCP 4.19+, ingress operator may own this subscription (channel: stable, Manual).
+  channel: stable-3.2
+  installPlanApproval: Automatic
+  name: servicemeshoperator3
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  startingCSV: servicemeshoperator3.v3.2.5

@@ -1,0 +1,23 @@
+# Attaches user, subscription, and model labels to Kuadrant/Limitador metrics at the gateway.
+# Required for Observe & monitor → Dashboard → Usage tab filters and token charts.
+apiVersion: extensions.kuadrant.io/v1alpha1
+kind: TelemetryPolicy
+metadata:
+  name: maas-usage-telemetry
+  namespace: openshift-ingress
+  labels:
+    app.kubernetes.io/part-of: maas-observability
+spec:
+  metrics:
+    default:
+      labels:
+        model: responseBodyJSON("/model")
+        tier: auth.identity.tier
+        user: auth.identity.userid
+        subscription: auth.identity.selected_subscription
+        organization_id: auth.identity.organizationId
+        cost_center: auth.identity.costCenter
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: Gateway
+    name: maas-default-gateway

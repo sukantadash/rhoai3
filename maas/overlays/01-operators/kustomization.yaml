@@ -1,0 +1,12 @@
+# Apply first: installs OSM, NFD, NVIDIA GPU, Connectivity Link, Leader Worker Set, and RHOAI operators.
+# Prerequisites: OCP 4.19.9+; OSM 3.2 (RHCL 1.4); cert-manager Operator.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base/operators/nfd
+  - ../../base/operators/nvidia
+  - ../../base/operators/cert-manager
+  - ../../base/operators/connectivity-link
+  - ../../base/operators/leaderworkerset
+  - ../../base/operators/rhoai

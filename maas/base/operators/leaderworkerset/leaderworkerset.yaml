@@ -1,0 +1,33 @@
+---
+# Leader Worker Set operator for multi-node AI/ML inference (LeaderWorkerSet API).
+# Prerequisite: cert-manager Operator for Red Hat OpenShift.
+# See: https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/ai_workloads/leader-worker-set-operator
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-lws-operator
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-lws-operator
+  namespace: openshift-lws-operator
+spec:
+  targetNamespaces:
+    - openshift-lws-operator
+  upgradeStrategy: Default
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  labels:
+    operators.coreos.com/leader-worker-set.openshift-lws-operator: ''
+  name: leader-worker-set
+  namespace: openshift-lws-operator
+spec:
+  channel: stable-v1.0
+  installPlanApproval: Automatic
+  name: leader-worker-set
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  startingCSV: leader-worker-set.v1.0.0

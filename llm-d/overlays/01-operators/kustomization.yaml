@@ -1,0 +1,10 @@
+# Apply first: Service Mesh, Connectivity Link, Leader Worker Set, and RHOAI operators.
+# Prerequisites: OpenShift cluster with OLM; cert-manager Operator; GPU setup per ./ocp-gpu-setup/README.md
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../operators/servicemesh
+  - ../../operators/connectivity-link
+  - ../../operators/leaderworkerset
+  - ../../operators/rhoai

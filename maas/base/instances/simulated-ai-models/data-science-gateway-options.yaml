@@ -1,0 +1,24 @@
+# Patch the RHOAI dashboard gateway (data-science-gateway) istio-proxy memory.
+# Kuadrant creates EnvoyFilters for maas-default-gateway in openshift-ingress;
+# Istio 1.26 (openshift-gateway revision) applies them to ALL gateways in that
+# namespace, so data-science-gateway loads MaaS WASM and OOMs at the 1Gi default.
+# Apply after RHOAI GatewayConfig creates data-science-gateway-config (phase 07+).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: data-science-gateway-config
+  namespace: openshift-ingress
+data:
+  deployment: |
+    spec:
+      template:
+        spec:
+          containers:
+          - name: istio-proxy
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512Mi
+              limits:
+                cpu: "2"
+                memory: 4Gi

@@ -1,0 +1,8 @@
+# Default model deployment. Uncomment alternatives in this file as needed.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - qwen-llm-infra.yaml
+  # - gpt-oss-20b.yaml
+  # - qwen-8b-redhat.yaml

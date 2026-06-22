@@ -1,0 +1,10 @@
+apiVersion: kuadrant.io/v1beta1
+kind: Kuadrant
+metadata:
+  name: kuadrant
+  namespace: rh-connectivity-link
+spec:
+  # Creates Limitador/Authorino PodMonitors scraped by User Workload Monitoring.
+  # Required for MaaS Usage dashboard (with UWM enabled via base/instances/uwm/).
+  observability:
+    enable: true
