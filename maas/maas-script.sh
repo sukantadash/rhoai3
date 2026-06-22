@@ -13,7 +13,7 @@ oc apply -k ./maas/overlays/01-operators/
 
 #approve installplan for rhcl-operator.v1.3.3
 #oc get installplan -n rh-connectivity-link 
-#oc patch installplan install-cmp68 -n rh-connectivity-link \
+#oc patch installplan install-7bmx9 -n rh-connectivity-link \
 #  --type merge -p '{"spec":{"approved":true}}'
 
 
