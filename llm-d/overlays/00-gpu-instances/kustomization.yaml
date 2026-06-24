@@ -1,0 +1,6 @@
+# NFD + GPU Operator CRs (ocp-gpu-setup README step 4). Wait for operators before applying.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../instances/gpu

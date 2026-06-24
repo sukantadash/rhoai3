@@ -6,7 +6,7 @@ metadata:
 spec:
   model:
     uri: hf://sshleifer/tiny-gpt2 # ~2MB test model, simulator ignores it anyway
-    name: facebook/opt-125m
+    name: simulated-premium
   replicas: 1
   router: 
     route: {}
@@ -25,7 +25,7 @@ spec:
         - --port
         - "8000" 
         - --model
-        - facebook/opt-125m
+        - simulated-premium
         - --mode
         - random
         - --ssl-certfile

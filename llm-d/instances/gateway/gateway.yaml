@@ -19,7 +19,7 @@ spec:
                 values:
                   - user1
                   - demo-llm
-      hostname: inference-gateway.apps.cluster-qdsnz.qdsnz.sandbox5306.opentlc.com
+      hostname: inference-gateway.apps.cluster-bvbpt.bvbpt.sandbox5358.opentlc.com
       name: https
       port: 443
       protocol: HTTPS

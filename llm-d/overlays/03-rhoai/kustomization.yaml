@@ -1,4 +1,4 @@
-# DataScienceCluster and dashboard config. Apply after RHOAI operator is ready.
+# DataScienceCluster and DSCInitialization. Apply after RHOAI operator CSV is Succeeded.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 

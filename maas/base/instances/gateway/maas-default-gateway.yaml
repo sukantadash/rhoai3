@@ -18,14 +18,14 @@ spec:
     - allowedRoutes:
         namespaces:
           from: All
-      hostname: maas.apps.cluster-prdfw.prdfw.sandbox2719.opentlc.com
+      hostname: maas.apps.cluster-6rgxd.6rgxd.sandbox3398.opentlc.com
       name: http
       port: 80
       protocol: HTTP
     - allowedRoutes:
         namespaces:
           from: All
-      hostname: maas.apps.cluster-prdfw.prdfw.sandbox2719.opentlc.com
+      hostname: maas.apps.cluster-6rgxd.6rgxd.sandbox3398.opentlc.com
       name: https
       port: 443
       protocol: HTTPS

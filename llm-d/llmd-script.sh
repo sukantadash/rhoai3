@@ -1,14 +1,40 @@
 #!/usr/bin/env bash
 # llm-d deployment — kustomize overlay flow (mirrors maas-script.sh pattern).
-# Prerequisites: ./ocp-gpu-setup/README.md (NFD + NVIDIA GPU Operator)
+# Prerequisites: GPU worker nodes (see ../../ocp-gpu-setup/README.md step 1).
 
 set -euo pipefail
 
-cd "$(dirname "$0")/llm-d"
+cd "$(dirname "$0")"
+
+# GPU setup: NFD + NVIDIA GPU Operator (ocp-gpu-setup README steps 2–4).
+oc apply -k ./overlays/00-gpu-operators/
+echo "Waiting for NFD and GPU Operator to install..."
+oc wait --for=condition=Available subscription/nfd -n openshift-nfd --timeout=600s
+oc wait --for=condition=Available subscription/gpu-operator-certified -n nvidia-gpu-operator --timeout=600s
+
+oc apply -k ./overlays/00-gpu-instances/
 
 oc apply -k ./overlays/01-operators/
+
+echo "Waiting for RHOAI operator to install..."
+oc wait csv -n redhat-ods-operator \
+  -l operators.coreos.com/rhods-operator.redhat-ods-operator="" \
+  --for=condition=Succeeded --timeout=600s
+
+#oc get installplan -n kuadrant-system
+#oc patch installplan install-dnqkx -n kuadrant-system \
+#  --type merge -p '{"spec":{"approved":true}}'
+
 oc apply -k ./overlays/02-operator-instances/
+
+echo "Applying DataScienceCluster and DSCInitialization..."
 oc apply -k ./overlays/03-rhoai/
+oc wait --for=jsonpath='{.status.phase}'=Ready dscinitialization/default-dsci --timeout=600s
+oc wait --for=jsonpath='{.status.phase}'=Ready datasciencecluster/default-dsc --timeout=600s
+
+echo "Waiting for OdhDashboardConfig CRD..."
+oc wait --for=condition=Established crd/odhdashboardconfigs.opendatahub.io --timeout=600s
+oc apply -k ./overlays/03-rhoai-dashboard/
 
 # Update hostname in instances/gateway/gateway.yaml and issuer in tlspolicy.yaml before applying.
 #the issuer in the tlspolicy.yaml should be the same as cluster issuer (oc get clusterissuer
@@ -24,7 +50,7 @@ oc annotate svc/authorino-authorino-authorization \
 
 oc apply -k ./overlays/05-authorino/
 oc apply -k ./overlays/06-hardware-profile/
-oc apply -k ./overlays/07-demo-llm/
+oc apply -k ./overlays/07-demo-llm/  #test user creation is done here
 oc apply -k ./overlays/08-llm-models/
 
 # --- Verify LLM deployment ---

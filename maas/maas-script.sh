@@ -22,6 +22,7 @@ oc apply -k ./maas/overlays/02-operator-instances/
 # Phase 3: gateway — update hostname in maas-default-gateway.yaml before applying
 oc apply -k ./maas/overlays/03-gateway/
 
+#oc get gateway -n openshift-ingress
 
 # Authorino must trust the OpenShift service CA for outbound HTTPS to maas-api
 oc set env deployment/authorino -n rh-connectivity-link \
@@ -44,7 +45,7 @@ oc apply -k ./maas/overlays/10-observability-dashboard-rhoai/
 
 #approve the installplan for cluster-observability-operator.v1.4.0
 #oc get installplan -n openshift-cluster-observability-operator
-#oc patch installplan install-cmp68 -n openshift-cluster-observability-operator \
+#oc patch installplan install-ct7zp -n openshift-cluster-observability-operator \
 #  --type merge -p '{"spec":{"approved":true}}'
 
 # MaaS usage metrics: TelemetryPolicy labels + Limitador scrape for Usage dashboard
@@ -60,8 +61,10 @@ oc get istio default -n istio-system \
 oc get istio openshift-gateway -n openshift-ingress \
   -o custom-columns=NAME:.metadata.name,VERSION:.spec.version,NOTE:.metadata.name
 oc get pods -n openshift-ingress -l 'gateway.networking.k8s.io/gateway-name in (maas-default-gateway-istio,data-science-gateway-data-science-gateway-class)'
+
 oc get gateway maas-default-gateway -n openshift-ingress \
   -o jsonpath='{range .status.conditions[*]}{.type}={.status}{"\n"}{end}'
+
 oc get kuadrant -n rh-connectivity-link
 oc get maassubscription -A
 oc get externalmodel,maasmodelref -n ai-models
@@ -96,7 +99,7 @@ oc delete -k ./maas/overlays/01-operators/
 
 oc port-forward -n openshift-ingress svc/maas-default-gateway-openshift-default 18080:80
 
-export GATEWAY_HOST="maas.apps.cluster-prdfw.prdfw.sandbox2719.opentlc.com"
+export GATEWAY_HOST="maas.apps.cluster-6rgxd.6rgxd.sandbox3398.opentlc.com"
 export HOST="http://127.0.0.1:18080"
 
 #list models:
@@ -121,7 +124,7 @@ echo "${API_KEY:0:30}..."
 curl -sS -H "Host: ${GATEWAY_HOST}" \
   -H "Authorization: Bearer ${API_KEY}" \
   -H "Content-Type: application/json" \
-  -d '{"model":"facebook/opt-125m","messages":[{"role":"user","content":"Hello"}]}' \
+  -d '{"model":"simulated-free","messages":[{"role":"user","content":"What is the capital of France?"}]}' \
   "${HOST}/ai-models/simulated-free/v1/chat/completions" | jq .
 
 #Inference External Model
@@ -129,5 +132,5 @@ curl -sS -H "Host: ${GATEWAY_HOST}" \
 curl -sS -H "Host: ${GATEWAY_HOST}" \
   -H "Authorization: Bearer ${API_KEY}" \
   -H "Content-Type: application/json" \
-  -d '{"model":"llama-scout-17b","messages":[{"role":"user","content":"Hello"}]}' \
+  -d '{"model":"llama-scout-17b","messages":[{"role":"user","content":"What is the capital of India?"}]}' \
   "${HOST}/ai-models/my-external-model/v1/chat/completions" | jq .

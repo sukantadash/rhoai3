@@ -1,0 +1,6 @@
+# OdhDashboardConfig — apply after DataScienceCluster is Ready (CRD is created during DSC reconciliation).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../instances/rhoai-dashboard
