@@ -2,7 +2,7 @@
 # for AuthPolicy evaluation.
 #
 # This policy allows ingress from Authorino pods in the recommended Kuadrant
-# installation namespaces (rh-connectivity-link or openshift-operators).
+# installation namespaces (kuadrant-system or openshift-operators).
 #
 # If Kuadrant is installed in a different namespace, users will need to create
 # their own NetworkPolicy to allow traffic from that namespace.
@@ -33,14 +33,13 @@ spec:
   policyTypes:
     - Ingress
   ingress:
-    # Allow traffic from Authorino pods in rh-connectivity-link or openshift-operators
+    # Allow traffic from Authorino pods in kuadrant-system or openshift-operators
     - from:
         - namespaceSelector:
             matchExpressions:
               - key: kubernetes.io/metadata.name
                 operator: In
                 values:
-                  - rh-connectivity-link
                   - kuadrant-system
                   - openshift-operators
           podSelector:

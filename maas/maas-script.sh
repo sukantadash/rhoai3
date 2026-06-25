@@ -12,26 +12,27 @@ oc apply -k ./maas/base/instances/servicemesh/
 oc apply -k ./maas/overlays/01-operators/
 
 #approve installplan for rhcl-operator.v1.3.3
-#oc get installplan -n rh-connectivity-link 
-#oc patch installplan install-7bmx9 -n rh-connectivity-link \
+#oc get installplan -n kuadrant-system 
+#oc patch installplan install-m2wm7 -n kuadrant-system \
 #  --type merge -p '{"spec":{"approved":true}}'
 
 
 oc apply -k ./maas/overlays/02-operator-instances/
 
+
 # Phase 3: gateway — update hostname in maas-default-gateway.yaml before applying
 oc apply -k ./maas/overlays/03-gateway/
-
 #oc get gateway -n openshift-ingress
 
 # Authorino must trust the OpenShift service CA for outbound HTTPS to maas-api
-oc set env deployment/authorino -n rh-connectivity-link \
+oc set env deployment/authorino -n kuadrant-system \
   SSL_CERT_FILE=/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt \
   REQUESTS_CA_BUNDLE=/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
 
-oc rollout status deployment/authorino -n rh-connectivity-link --timeout=120s
+oc rollout status deployment/authorino -n kuadrant-system --timeout=120s
 
-oc patch networkpolicy maas-authorino-allow -n redhat-ods-applications --type='json' -p='[{"op": "replace", "path": "/spec/ingress/0/from/0/namespaceSelector/matchExpressions/0/values", "value": ["rh-connectivity-link", "kuadrant-system", "openshift-operators"]}]'
+oc patch networkpolicy maas-authorino-allow -n redhat-ods-applications --type='json' -p='[{"op": "replace", "path": "/spec/ingress/0/from/0/namespaceSelector/matchExpressions/0/values", "value": ["kuadrant-system", "openshift-operators"]}]'
+
 
 oc apply -k ./maas/overlays/04-postgres/
 oc apply -k ./maas/overlays/05-rhoai/
@@ -42,15 +43,12 @@ oc apply -k ./maas/overlays/08-simulated-models/
 oc apply -k ./maas/overlays/08-external-models/
 oc apply -k ./maas/overlays/09-maas-subscriptions/
 oc apply -k ./maas/overlays/10-observability-dashboard-rhoai/
+oc apply -k ./maas/overlays/11-maas-telemetry/
 
 #approve the installplan for cluster-observability-operator.v1.4.0
 #oc get installplan -n openshift-cluster-observability-operator
-#oc patch installplan install-ct7zp -n openshift-cluster-observability-operator \
+#oc patch installplan install-chmct -n openshift-cluster-observability-operator \
 #  --type merge -p '{"spec":{"approved":true}}'
-
-# MaaS usage metrics: TelemetryPolicy labels + Limitador scrape for Usage dashboard
-# Apply after observability platform (overlay 10) and MaaS subscriptions (overlay 09)
-oc apply -k ./maas/overlays/11-maas-observability/
 
 # Verification
 echo "--- Verification ---"
@@ -65,15 +63,17 @@ oc get pods -n openshift-ingress -l 'gateway.networking.k8s.io/gateway-name in (
 oc get gateway maas-default-gateway -n openshift-ingress \
   -o jsonpath='{range .status.conditions[*]}{.type}={.status}{"\n"}{end}'
 
-oc get kuadrant -n rh-connectivity-link
+oc get kuadrant -n kuadrant-system
 oc get maassubscription -A
 oc get externalmodel,maasmodelref -n ai-models
 oc get httproute,serviceentry,destinationrule -n ai-models
-oc get telemetrypolicy -n openshift-ingress
+oc get tenant default-tenant -n models-as-a-service -o jsonpath='telemetry.enabled={.spec.telemetry.enabled}{"\n"}'
+oc get telemetrypolicy maas-telemetry -n openshift-ingress
+oc get telemetry latency-per-subscription -n openshift-ingress
 oc get configmap cluster-monitoring-config -n openshift-monitoring -o jsonpath='{.data.config\.yaml}{"\n"}'
 oc get pods -n openshift-user-workload-monitoring
-oc get podmonitor,servicemonitor -n rh-connectivity-link | grep -iE 'limitador|kuadrant|authorino' || true
-oc get kuadrant kuadrant -n rh-connectivity-link -o jsonpath='observability.enable={.spec.observability.enable}{"\n"}'
+oc get podmonitor,servicemonitor -n kuadrant-system | grep -iE 'limitador|kuadrant|authorino' || true
+oc get kuadrant kuadrant -n kuadrant-system -o jsonpath='observability.enable={.spec.observability.enable}{"\n"}'
 # Usage dashboard queries cluster Thanos (NOT data-science-monitoringstack Prometheus):
 # oc run curl-thanos --rm -i --restart=Never --image=curlimages/curl -- \
 #   curl -s "http://thanos-querier.openshift-monitoring.svc:9091/api/v1/query?query=authorized_hits"
@@ -81,7 +81,7 @@ oc get kuadrant kuadrant -n rh-connectivity-link -o jsonpath='observability.enab
 
 #clean up:
 
-oc delete -k ./maas/overlays/11-maas-observability/
+oc delete -k ./maas/overlays/11-maas-telemetry/
 oc delete -k ./maas/overlays/10-observability-dashboard-rhoai/
 oc delete -k ./maas/overlays/09-maas-subscriptions/
 oc delete -k ./maas/overlays/08-external-models/
@@ -97,10 +97,8 @@ oc delete -k ./maas/overlays/01-operators/
 #test:
 
 
-oc port-forward -n openshift-ingress svc/maas-default-gateway-openshift-default 18080:80
-
-export GATEWAY_HOST="maas.apps.cluster-6rgxd.6rgxd.sandbox3398.opentlc.com"
-export HOST="http://127.0.0.1:18080"
+export GATEWAY_HOST=$(oc get ingresses.config.openshift.io cluster -o jsonpath='{.spec.domain}')
+export HOST="https://${GATEWAY_HOST}"
 
 #list models:
 curl -sS -H "Host: ${GATEWAY_HOST}" \
@@ -119,7 +117,6 @@ API_KEY=$(curl -sS \
 echo "${API_KEY:0:30}..."
 
 
-#Inference Model
 
 curl -sS -H "Host: ${GATEWAY_HOST}" \
   -H "Authorization: Bearer ${API_KEY}" \

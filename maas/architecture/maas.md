@@ -110,8 +110,8 @@ Hosts the full MaaS platform (see `rhoai3/maas/` overlays). No GPU inference pod
 |-----------|-----------|---------|
 | `maas-default-gateway` | `openshift-ingress` | Single entry point for consumers |
 | `maas-api`, `maas-controller` | `redhat-ods-applications` | API keys, model catalog, subscriptions |
-| Authorino | `rh-connectivity-link` | Authentication and authorization |
-| Limitador / Kuadrant | `rh-connectivity-link` | Rate limiting and policy enforcement |
+| Authorino | `kuadrant-system` | Authentication and authorization |
+| Limitador / Kuadrant | `kuadrant-system` | Rate limiting and policy enforcement |
 | Postgres | `ai-models` (or dedicated) | MaaS metadata persistence |
 | `ExternalModel` | `ai-models` | Points to LB FQDN; BBR routes outbound |
 | `MaaSModelRef` | `ai-models` | Registers external model in catalog |
@@ -247,7 +247,7 @@ flowchart LR
 `LLMInferenceService` with a gateway ref only works within a single OpenShift cluster. For models on separate clusters, MaaS treats the LB-backed endpoint as an OpenAI-compatible external provider via `ExternalModel` and BBR.
 
 **Observability**  
-MaaS usage metrics (Authorino hits, Limitador counters) stay on the MaaS cluster (overlay `11-maas-observability`). Per-cluster llm-d metrics remain on each model cluster's monitoring stack. Correlate by request ID / trace context if distributed tracing is enabled.
+MaaS usage metrics (Authorino hits, Limitador counters) stay on the MaaS cluster (overlay `11-maas-telemetry` — Tenant-managed telemetry). Per-cluster llm-d metrics remain on each model cluster's monitoring stack. Correlate by request ID / trace context if distributed tracing is enabled.
 
 **Failure modes**
 

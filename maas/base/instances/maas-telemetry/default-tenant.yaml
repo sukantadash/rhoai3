@@ -1,0 +1,20 @@
+# Operator-managed MaaS observability (Option 1).
+# Apply after overlay 05-rhoai (Tenant exists) and 09-maas-subscriptions (AuthPolicy).
+# Creates maas-telemetry TelemetryPolicy and latency-per-subscription Istio Telemetry.
+# See: https://opendatahub-io.github.io/models-as-a-service/dev/observability/setup/
+apiVersion: maas.opendatahub.io/v1alpha1
+kind: Tenant
+metadata:
+  name: default-tenant
+  namespace: models-as-a-service
+spec:
+  gatewayRef:
+    name: maas-default-gateway
+    namespace: openshift-ingress
+  telemetry:
+    enabled: true
+    metrics:
+      captureOrganization: true
+      captureUser: true
+      captureGroup: false     # High cardinality
+      captureModelUsage: true

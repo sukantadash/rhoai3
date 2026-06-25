@@ -67,8 +67,8 @@ oc apply -k ./maas/overlays/02-operator-instances/
 Some clusters require manual InstallPlan approval for RHCL:
 
 ```bash
-oc get installplan -n rh-connectivity-link
-oc patch installplan <name> -n rh-connectivity-link \
+oc get installplan -n kuadrant-system
+oc patch installplan <name> -n kuadrant-system \
   --type merge -p '{"spec":{"approved":true}}'
 ```
 
@@ -86,14 +86,14 @@ oc get gateway maas-default-gateway -n openshift-ingress
 Required so Authorino trusts the OpenShift service CA when calling `maas-api`:
 
 ```bash
-oc set env deployment/authorino -n rh-connectivity-link \
+oc set env deployment/authorino -n kuadrant-system \
   SSL_CERT_FILE=/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt \
   REQUESTS_CA_BUNDLE=/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
 
-oc rollout status deployment/authorino -n rh-connectivity-link --timeout=120s
+oc rollout status deployment/authorino -n kuadrant-system --timeout=120s
 
 oc patch networkpolicy maas-authorino-allow -n redhat-ods-applications --type='json' \
-  -p='[{"op": "replace", "path": "/spec/ingress/0/from/0/namespaceSelector/matchExpressions/0/values", "value": ["rh-connectivity-link", "kuadrant-system", "openshift-operators"]}]'
+  -p='[{"op": "replace", "path": "/spec/ingress/0/from/0/namespaceSelector/matchExpressions/0/values", "value": ["kuadrant-system", "openshift-operators"]}]'
 ```
 
 ### Phase 4 — Platform (`overlays/04`–`07`)
@@ -126,7 +126,16 @@ Simulated models are for local testing. External models register remote endpoint
 ```bash
 oc apply -k ./maas/overlays/09-maas-subscriptions/
 oc apply -k ./maas/overlays/10-observability-dashboard-rhoai/
-oc apply -k ./maas/overlays/11-maas-observability/
+oc apply -k ./maas/overlays/11-maas-telemetry/
+```
+
+Overlay `11-maas-telemetry` enables operator-managed observability via the Tenant CR ([MaaS observability setup — Option 1](https://opendatahub-io.github.io/models-as-a-service/dev/observability/setup/)). The operator creates `maas-telemetry` and `latency-per-subscription`.
+
+If migrating from the old manual TelemetryPolicy overlay, delete the previous resources first:
+
+```bash
+oc delete telemetrypolicy maas-usage-telemetry -n openshift-ingress --ignore-not-found
+oc delete telemetry maas-gateway-latency-per-tier -n openshift-ingress --ignore-not-found
 ```
 
 Cluster Observability Operator may require manual InstallPlan approval (see comments in `maas-script.sh`).
@@ -138,10 +147,12 @@ Cluster Observability Operator may require manual InstallPlan approval (see comm
 ```bash
 oc get csv -n openshift-operators -l operators.coreos.com/operator.servicemeshoperator3
 oc get gateway maas-default-gateway -n openshift-ingress
-oc get kuadrant -n rh-connectivity-link
+oc get kuadrant -n kuadrant-system
 oc get maassubscription -A
 oc get externalmodel,maasmodelref -n ai-models
-oc get telemetrypolicy -n openshift-ingress
+oc get tenant default-tenant -n models-as-a-service
+oc get telemetrypolicy maas-telemetry -n openshift-ingress
+oc get telemetry latency-per-subscription -n openshift-ingress
 ```
 
 ## Testing inference
@@ -188,7 +199,7 @@ curl -sS -H "Host: ${GATEWAY_HOST}" \
 `maas-script.sh` includes teardown commands (reverse overlay order):
 
 ```bash
-oc delete -k ./maas/overlays/11-maas-observability/
+oc delete -k ./maas/overlays/11-maas-telemetry/
 oc delete -k ./maas/overlays/10-observability-dashboard-rhoai/
 oc delete -k ./maas/overlays/09-maas-subscriptions/
 oc delete -k ./maas/overlays/08-external-models/
