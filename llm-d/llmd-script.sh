@@ -54,41 +54,33 @@ oc apply -k ./overlays/07-demo-llm/  #test user creation is done here
 oc apply -k ./overlays/08-llm-models/
 
 # --- Verify LLM deployment ---
-# Defaults match instances/llm-models/kustomization.yaml (qwen).
-# For gpt-oss-20b: LLM_NAME=gpt-oss-20b LLM_MODEL=openai/gpt-oss-20b ./llmd-script.sh
-LLM_NAMESPACE="${LLM_NAMESPACE:-demo-llm}"
-LLM_NAME="${LLM_NAME:-qwen}"
-LLM_MODEL="${LLM_MODEL:-Qwen/Qwen3-0.6B}"
-LLM_PORT="${LLM_PORT:-18080}"
 
-echo "Waiting for LLMInferenceService/${LLM_NAME} to become Ready..."
-oc wait --for=condition=Ready "llminferenceservice/${LLM_NAME}" -n "${LLM_NAMESPACE}" --timeout=600s
 
-export TEST_TOKEN
-TEST_TOKEN="$(oc create token test-user -n "${LLM_NAMESPACE}")"
-export LLM_URL="https://127.0.0.1:${LLM_PORT}"
+LLM_NAMESPACE=demo-llm
+LLM_NAME=qwen
+LLM_MODEL="Qwen/Qwen3-0.6B"
+GATEWAY_HOST=$(oc get gateway openshift-ai-inference -n openshift-ingress \
+  -o jsonpath='{.spec.listeners[0].hostname}')
 
-echo "Port-forwarding svc/${LLM_NAME}-kserve-workload-svc to localhost:${LLM_PORT}..."
-oc port-forward -n "${LLM_NAMESPACE}" "svc/${LLM_NAME}-kserve-workload-svc" "${LLM_PORT}:8000" &
-PF_PID=$!
-cleanup() { kill "${PF_PID}" 2>/dev/null || true; }
-trap cleanup EXIT
-sleep 5
+GATEWAY_URL="https://${GATEWAY_HOST}/${LLM_NAMESPACE}/${LLM_NAME}"
+TEST_TOKEN="$(oc create token test-user -n ${LLM_NAMESPACE})"
 
-echo "Listing models..."
-curl -sk "${LLM_URL}/v1/models" \
-  -H "Authorization: Bearer ${TEST_TOKEN}"
-echo
+oc wait --for=condition=Ready "llminferenceservice/${LLM_NAME}" \
+  -n "${LLM_NAMESPACE}" --timeout=600s
 
-echo "Running completion test..."
-curl -sk "${LLM_URL}/v1/completions" \
+echo "Gateway URL: ${GATEWAY_URL}"
+echo "TEST_TOKEN: ${TEST_TOKEN}"
+curl -sS "${GATEWAY_URL}/v1/models" \
+  -H "Authorization: Bearer ${TEST_TOKEN}" | jq .
+
+echo "Gateway URL: ${GATEWAY_URL}"
+echo "TEST_TOKEN: ${TEST_TOKEN}"
+
+curl -sS "${GATEWAY_URL}/v1/chat/completions" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${TEST_TOKEN}" \
-  -d "{
-    \"model\": \"${LLM_MODEL}\",
-    \"prompt\": \"what is the capital of France?\"
-  }"
-echo
+  -d "{\"model\":\"${LLM_MODEL}\",\"messages\":[{\"role\":\"user\",\"content\":\"What is the capital of France?\"}]}" | jq .
+
 
 
 #update guidellm-benchmark-job.yaml with the correct LLM_URL and LLM_MODEL

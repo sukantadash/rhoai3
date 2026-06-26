@@ -2,6 +2,8 @@
 
 This document describes a **three-cluster topology**: one **MaaS control-plane cluster** that exposes a unified API to consumers, and two **model clusters** where inference workloads run on **llm-d** (LLMInferenceService + vLLM). A shared **load balancer** sits in front of the model clusters and is registered on the MaaS cluster as an `ExternalModel` endpoint.
 
+> **Two-cluster PoC (MaaS CPU + one llm-d GPU cluster, nginx reverse proxy, Route or MetalLB):** see [multicluster-maas-llmd.md](multicluster-maas-llmd.md).
+
 ## Overview
 
 | Cluster | Role | Key stack |

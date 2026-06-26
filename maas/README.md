@@ -2,7 +2,10 @@
 
 Deploy a **Models-as-a-Service (MaaS)** control-plane cluster on OpenShift using kustomize overlays and `maas-script.sh`. This cluster exposes a unified API gateway for model catalog, API keys, subscriptions, rate limiting, and routing to simulated or external models.
 
-For multi-cluster topology (MaaS + llm-d model clusters + load balancer), see [architecture/maas.md](architecture/maas.md).
+| Architecture guide | Description |
+|---------------------|-------------|
+| [architecture/multicluster-maas-llmd.md](architecture/multicluster-maas-llmd.md) | **PoC:** MaaS on CPU cluster + remote llm-d on GPU cluster (overlays 12–13, Route vs MetalLB) |
+| [architecture/maas.md](architecture/maas.md) | **HA:** MaaS + multiple GPU clusters behind a shared load balancer |
 
 ## Prerequisites
 

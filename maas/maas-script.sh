@@ -50,6 +50,9 @@ oc apply -k ./maas/overlays/11-maas-telemetry/
 #oc patch installplan install-chmct -n openshift-cluster-observability-operator \
 #  --type merge -p '{"spec":{"approved":true}}'
 
+
+
+
 # Verification
 echo "--- Verification ---"
 oc get csv -n openshift-operators -l operators.coreos.com/operator.servicemeshoperator3 \
@@ -131,3 +134,73 @@ curl -sS -H "Host: ${GATEWAY_HOST}" \
   -H "Content-Type: application/json" \
   -d '{"model":"llama-scout-17b","messages":[{"role":"user","content":"What is the capital of India?"}]}' \
   "${HOST}/ai-models/my-external-model/v1/chat/completions" | jq .
+
+
+
+
+
+#maas to access models from external clusters ---------
+
+# Login to llm-d cluster; deploy qwen per llmd-script.sh.
+
+# Update placeholders in base/instances/reverse-proxy-llminference/configmap-nginx.yaml
+# and route.yaml (<cluster-domain>, <llm-namespace>, <llm-name>) using DOMAIN below, then apply:
+
+DOMAIN=$(oc get ingresses.config cluster -o jsonpath='{.spec.domain}')
+UPSTREAM_HOST="inference-gateway.${DOMAIN}"
+PROXY_HOST="qwen-maas.${DOMAIN}"
+echo "DOMAIN=$DOMAIN"
+echo "UPSTREAM_HOST=$UPSTREAM_HOST"
+echo "PROXY_HOST=$PROXY_HOST"
+
+oc apply -k ./maas/overlays/13-reverse-proxy-llminference/
+oc rollout status deployment/qwen-maas-proxy -n qwen-maas-proxy --timeout=120s
+
+# verification reverse-proxy to access the model from external cluster
+
+export TEST_TOKEN="$(oc create token test-user -n demo-llm)"
+echo "TEST_TOKEN=$TEST_TOKEN"
+echo "PROXY_HOST=$PROXY_HOST"
+
+# Must be 200 — this is what MaaS/BBR will hit
+curl -sS -w "\nHTTP:%{http_code}\n" \
+  "https://${PROXY_HOST}/v1/chat/completions" \
+  -H "Authorization: Bearer ${TEST_TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"Qwen/Qwen3-0.6B","messages":[{"role":"user","content":"What is the capital of France?"}]}'
+
+# Streaming check (optional)
+curl -sS -N -w "\nHTTP:%{http_code}\n" \
+  "https://${PROXY_HOST}/v1/chat/completions" \
+  -H "Authorization: Bearer ${TEST_TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"Qwen/Qwen3-0.6B","messages":[{"role":"user","content":"Count to 5"}],"stream":true}'
+
+
+# Login to MaaS cluster, then register remote llm-d model (see base/instances/external-cluster-llminference/).
+# Update qwen-remote-external-model.yaml endpoint if PROXY_HOST differs from the llm-d cluster domain.
+#update the secret with the token TEST_TOKEN from the llm-d cluster (export TEST_TOKEN="$(oc create token test-user -n demo-llm)")
+
+oc apply -k ./maas/overlays/12-external-cluster-llminference/
+
+
+#verification: maas url to access the external cluster model
+
+MAAS_DOMAIN=$(oc get ingresses.config cluster -o jsonpath='{.spec.domain}')
+MAAS_HOST="maas.${MAAS_DOMAIN}"
+echo "MAAS_HOST=$MAAS_HOST"
+
+# Create MaaS API key
+API_KEY=$(curl -sS -H "Authorization: Bearer $(oc whoami -t)" \
+  -H "Content-Type: application/json" -X POST \
+  -d '{"name":"qwen-remote-test","expiration":"1h"}' \
+  "https://${MAAS_HOST}/maas-api/v1/api-keys" | jq -r .key)
+echo "${API_KEY:0:30}..."
+
+
+# Inference through MaaS → ExternalModel → llm-d cluster
+curl -sS "https://${MAAS_HOST}/ai-models/qwen-remote/v1/chat/completions" \
+  -H "Authorization: Bearer ${API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"Qwen/Qwen3-0.6B","messages":[{"role":"user","content":"What is the capital of France?"}]}' | jq .
+

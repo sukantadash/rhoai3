@@ -1,0 +1,7 @@
+# Deploy on the llm-d model cluster. Exposes /v1/* at qwen-maas.<cluster-domain> for MaaS ExternalModel.
+# Update upstream host and route host in base/instances/reverse-proxy-llminference/ before applying.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base/instances/reverse-proxy-llminference/

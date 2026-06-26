@@ -1,0 +1,47 @@
+# Rewrites /v1/* → inference-gateway/<namespace>/<model>/v1/* for MaaS ExternalModel (BBR uses /v1/ at host root).
+#
+# UPDATE BEFORE APPLY (llm-d cluster), e.g. in maas-script.sh overlay 13:
+#   DOMAIN=$(oc get ingresses.config cluster -o jsonpath='{.spec.domain}')
+#   UPSTREAM_HOST="inference-gateway.${DOMAIN}"
+#   LLM_NAMESPACE=demo-llm    # LLMInferenceService namespace
+#   LLM_NAME=qwen            # LLMInferenceService name
+#
+# Replace placeholders below:
+#   <cluster-domain>     → ${DOMAIN}
+#   <llm-namespace>      → ${LLM_NAMESPACE}
+#   <llm-name>           → ${LLM_NAME}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: qwen-maas-nginx-config
+  namespace: qwen-maas-proxy
+data:
+  nginx.conf: |
+    worker_processes auto;
+    events { worker_connections 1024; }
+    http {
+      upstream llm_d_gateway {
+        server inference-gateway.apps.<cluster-domain>:443;
+      }
+      server {
+        listen 8080;
+        location /v1/ {
+          proxy_pass https://llm_d_gateway/<llm-namespace>/<llm-name>/v1/;
+          proxy_ssl_server_name on;
+          proxy_ssl_name inference-gateway.apps.<cluster-domain>;
+          proxy_set_header Host inference-gateway.apps.<cluster-domain>;
+          proxy_set_header Authorization $http_authorization;
+          proxy_set_header Content-Type $http_content_type;
+          proxy_http_version 1.1;
+          proxy_buffering off;
+          proxy_request_buffering off;
+          proxy_read_timeout 600s;
+          proxy_send_timeout 600s;
+          chunked_transfer_encoding on;
+        }
+        location /health {
+          return 200 'ok';
+          add_header Content-Type text/plain;
+        }
+      }
+    }

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: qwen-maas-proxy
+  namespace: qwen-maas-proxy
+spec:
+  selector:
+    app: qwen-maas-proxy
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080

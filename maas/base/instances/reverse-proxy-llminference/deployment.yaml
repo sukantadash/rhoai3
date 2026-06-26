@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qwen-maas-proxy
+  namespace: qwen-maas-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qwen-maas-proxy
+  template:
+    metadata:
+      labels:
+        app: qwen-maas-proxy
+    spec:
+      containers:
+        - name: nginx
+          image: registry.redhat.io/ubi9/nginx-126:latest
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+          command: ["/bin/sh", "-c"]
+          args:
+            - exec nginx -g 'daemon off;'
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 10
+      volumes:
+        - name: config
+          configMap:
+            name: qwen-maas-nginx-config

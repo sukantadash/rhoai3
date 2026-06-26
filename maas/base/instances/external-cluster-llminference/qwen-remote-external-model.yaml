@@ -1,0 +1,14 @@
+# Remote llm-d model via qwen-maas nginx proxy on the model cluster.
+# Update endpoint to match PROXY_HOST on the llm-d cluster:
+#   qwen-maas.$(oc get ingresses.config cluster -o jsonpath='{.spec.domain}')
+apiVersion: maas.opendatahub.io/v1alpha1
+kind: ExternalModel
+metadata:
+  name: qwen-remote
+  namespace: ai-models
+spec:
+  provider: openai
+  endpoint: qwen-maas.apps.cluster-bvbpt.bvbpt.sandbox5358.opentlc.com
+  targetModel: "Qwen/Qwen3-0.6B"
+  credentialRef:
+    name: qwen-remote-credentials
