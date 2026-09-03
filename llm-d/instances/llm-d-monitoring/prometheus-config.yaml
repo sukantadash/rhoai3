@@ -96,7 +96,7 @@ data:
       relabel_configs:
       - source_labels: [__meta_kubernetes_service_label_llm_d_ai_model]
         action: keep
-        regex: 'llama-.*'
+        regex: '.*'
       - source_labels: [__meta_kubernetes_endpoint_port_name]
         action: keep
         regex: vllm

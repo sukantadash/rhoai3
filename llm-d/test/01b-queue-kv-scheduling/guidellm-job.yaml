@@ -1,0 +1,55 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: guidellm-01b-queue-kv
+  namespace: demo-llm
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: test-user
+      imagePullSecrets:
+        - name: ghcr-pull-secret
+      containers:
+      - name: guidellm
+        image: ${GUIDELLM_IMAGE}
+        env:
+          - name: LLM_URL
+            value: "${LLM_URL}"
+          - name: LLM_MODEL
+            value: "${LLM_MODEL}"
+          - name: HF_HOME
+            value: /tmp/hf-cache
+          - name: TRANSFORMERS_CACHE
+            value: /tmp/hf-cache
+          - name: XDG_CACHE_HOME
+            value: /tmp
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            set -euo pipefail
+            TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+            guidellm run \
+              --backend "kind=openai_http,target=${LLM_URL},model=${LLM_MODEL},api_key=${TOKEN}" \
+              --data '{"kind":"synthetic_text","prompt_tokens":50,"output_tokens":128,"prefix_buckets":[{"bucket_weight":100,"prefix_count":1,"prefix_tokens":2048}]}' \
+              --profile "kind=exact,concurrency=80" \
+              --constraint "kind=max_duration,seconds=120" \
+              --tokenizer "kind=huggingface_auto,model=${LLM_MODEL}" \
+              --output "kind=json,path=/results/benchmark.json" \
+              --output "kind=csv,path=/results/benchmark.csv"
+            for f in benchmark.json benchmark.csv; do
+              echo "===GUIDELLM_FILE_BEGIN:${f}==="
+              base64 "/results/${f}"
+              echo "===GUIDELLM_FILE_END:${f}==="
+            done
+        volumeMounts:
+          - name: cache
+            mountPath: /tmp/hf-cache
+          - name: results
+            mountPath: /results
+      volumes:
+        - name: cache
+          emptyDir: {}
+        - name: results
+          emptyDir: {}
