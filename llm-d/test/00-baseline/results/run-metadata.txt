@@ -1,0 +1,11 @@
+scenario_dir=/Users/sudash/ai-projects/llm-d/rhoai3/llm-d/test/00-baseline
+job_name=guidellm-00-baseline
+namespace=demo-llm
+pod=guidellm-00-baseline-lq294
+collected_at=2026-09-03T15:36:01Z
+gateway_host=inference-gateway.apps.cluster-nqcv7.nqcv7.sandbox340.opentlc.com
+llm_url=https://inference-gateway.apps.cluster-nqcv7.nqcv7.sandbox340.opentlc.com/demo-llm/qwen
+start_time=2026-09-03T15:34:35Z
+end_time=2026-09-03T15:35:54Z
+files_copied=2
+files_failed=0

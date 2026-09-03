@@ -1,6 +1,4 @@
 **/results/*.json
-**/results/*.csv
 **/results/*.log
-**/results/run-metadata.txt
 **/.guidellm-job.rendered.yaml
 !**/results/.gitkeep

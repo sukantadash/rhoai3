@@ -1,0 +1,11 @@
+scenario_dir=/Users/sudash/ai-projects/llm-d/rhoai3/llm-d/test/01a-prefix-cache-routing
+job_name=guidellm-01a-prefix-cache
+namespace=demo-llm
+pod=guidellm-01a-prefix-cache-p7jnn
+collected_at=2026-09-03T16:33:32Z
+gateway_host=inference-gateway.apps.cluster-nqcv7.nqcv7.sandbox340.opentlc.com
+llm_url=https://inference-gateway.apps.cluster-nqcv7.nqcv7.sandbox340.opentlc.com/demo-llm/qwen
+start_time=2026-09-03T16:31:08Z
+end_time=2026-09-03T16:33:28Z
+files_copied=2
+files_failed=0

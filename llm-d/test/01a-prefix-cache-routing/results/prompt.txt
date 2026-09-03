@@ -1,0 +1,4 @@
+Explain the test results benchmark.csv, run-metadata.txt, [graphana screenshots], 
+create results.md,
+embed the grafana screenshots in results.md and
+validate the test results vs expected results as mentioned in TESTPLAN.md
