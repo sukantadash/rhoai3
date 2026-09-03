@@ -20,7 +20,8 @@ oc apply -k ./maas/overlays/01-operators/
 oc apply -k ./maas/overlays/02-operator-instances/
 
 
-# Phase 3: gateway — update hostname in maas-default-gateway.yaml before applying
+# Phase 3: gateway — update REPLACE_WITH_CLUSTER_APPS_DOMAIN in maas-default-gateway.yaml before applying
+# Cluster apps domain: apps.$(oc get ingresses.config cluster -o jsonpath='{.spec.domain}')
 oc apply -k ./maas/overlays/03-gateway/
 #oc get gateway -n openshift-ingress
 
@@ -40,6 +41,7 @@ oc apply -k ./maas/overlays/07-odhdashboard/
 
 
 oc apply -k ./maas/overlays/08-simulated-models/
+# Update REPLACE_WITH_API_KEY in base/instances/external-ai-models/external-model-credentials.yaml before applying
 oc apply -k ./maas/overlays/08-external-models/
 oc apply -k ./maas/overlays/09-maas-subscriptions/
 oc apply -k ./maas/overlays/10-observability-dashboard-rhoai/
@@ -147,8 +149,8 @@ curl -sS -H "Host: ${GATEWAY_HOST}" \
 # and route.yaml (<cluster-domain>, <llm-namespace>, <llm-name>) using DOMAIN below, then apply:
 
 DOMAIN=$(oc get ingresses.config cluster -o jsonpath='{.spec.domain}')
-UPSTREAM_HOST="inference-gateway.${DOMAIN}"
-PROXY_HOST="qwen-maas.${DOMAIN}"
+UPSTREAM_HOST="inference-gateway.apps.${DOMAIN}"
+PROXY_HOST="qwen-maas.apps.${DOMAIN}"
 echo "DOMAIN=$DOMAIN"
 echo "UPSTREAM_HOST=$UPSTREAM_HOST"
 echo "PROXY_HOST=$PROXY_HOST"
@@ -178,8 +180,11 @@ curl -sS -N -w "\nHTTP:%{http_code}\n" \
 
 
 # Login to MaaS cluster, then register remote llm-d model (see base/instances/external-cluster-llminference/).
-# Update qwen-remote-external-model.yaml endpoint if PROXY_HOST differs from the llm-d cluster domain.
-#update the secret with the token TEST_TOKEN from the llm-d cluster (export TEST_TOKEN="$(oc create token test-user -n demo-llm)")
+# Update REPLACE_WITH_CLUSTER_APPS_DOMAIN in qwen-remote-external-model.yaml (llm-d cluster apps domain).
+# Create qwen-remote-credentials secret with TEST_TOKEN from the llm-d cluster before applying:
+#   export TEST_TOKEN="$(oc create token test-user -n demo-llm)"
+#   oc create secret generic qwen-remote-credentials -n ai-models \
+#     --from-literal=api-key="${TEST_TOKEN}" --dry-run=client -o yaml | oc apply -f -
 
 oc apply -k ./maas/overlays/12-external-cluster-llminference/
 
@@ -187,7 +192,7 @@ oc apply -k ./maas/overlays/12-external-cluster-llminference/
 #verification: maas url to access the external cluster model
 
 MAAS_DOMAIN=$(oc get ingresses.config cluster -o jsonpath='{.spec.domain}')
-MAAS_HOST="maas.${MAAS_DOMAIN}"
+MAAS_HOST="maas.apps.${MAAS_DOMAIN}"
 echo "MAAS_HOST=$MAAS_HOST"
 
 # Create MaaS API key
@@ -203,4 +208,3 @@ curl -sS "https://${MAAS_HOST}/ai-models/qwen-remote/v1/chat/completions" \
   -H "Authorization: Bearer ${API_KEY}" \
   -H "Content-Type: application/json" \
   -d '{"model":"Qwen/Qwen3-0.6B","messages":[{"role":"user","content":"What is the capital of France?"}]}' | jq .
-

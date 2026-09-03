@@ -1,4 +1,4 @@
-# Update hostname and allowed namespace values before applying.
+# Update hostname and REPLACE_WITH_CLUSTER_APPS_DOMAIN before applying.
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
@@ -19,7 +19,7 @@ spec:
                 values:
                   - user1
                   - demo-llm
-      hostname: inference-gateway.apps.cluster-bvbpt.bvbpt.sandbox5358.opentlc.com
+      hostname: inference-gateway.REPLACE_WITH_CLUSTER_APPS_DOMAIN
       name: https
       port: 443
       protocol: HTTPS

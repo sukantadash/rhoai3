@@ -36,8 +36,9 @@ echo "Waiting for OdhDashboardConfig CRD..."
 oc wait --for=condition=Established crd/odhdashboardconfigs.opendatahub.io --timeout=600s
 oc apply -k ./overlays/03-rhoai-dashboard/
 
-# Update hostname in instances/gateway/gateway.yaml and issuer in tlspolicy.yaml before applying.
-#the issuer in the tlspolicy.yaml should be the same as cluster issuer (oc get clusterissuer
+# Update REPLACE_WITH_CLUSTER_APPS_DOMAIN in instances/gateway/gateway.yaml and issuer in tlspolicy.yaml before applying.
+# Cluster apps domain: apps.$(oc get ingresses.config cluster -o jsonpath='{.spec.domain}')
+# Issuer must match an existing ClusterIssuer (oc get clusterissuer).
 
 oc apply -k ./overlays/04-gateway/
 
@@ -81,10 +82,14 @@ curl -sS "${GATEWAY_URL}/v1/chat/completions" \
   -H "Authorization: Bearer ${TEST_TOKEN}" \
   -d "{\"model\":\"${LLM_MODEL}\",\"messages\":[{\"role\":\"user\",\"content\":\"What is the capital of France?\"}]}" | jq .
 
+# LLM-D monitoring
+oc apply -k ./overlays/09-llm-d-monitoring/
 
+# Verify LLM-D monitoring
+oc get pods -n llm-d-monitoring
 
-#update guidellm-benchmark-job.yaml with the correct LLM_URL and LLM_MODEL
+# Update REPLACE_WITH_CLUSTER_APPS_DOMAIN, LLM_URL path, and LLM_MODEL in instances/guidellm-benchmark/guidellm-benchmark-job.yaml before applying.
 
-oc apply -k ./overlays/09-guidellm-benchmark/
+oc apply -k ./overlays/10-guidellm-benchmark/
 
 oc logs -n demo-llm job/guidellm-benchmark -f

@@ -162,7 +162,7 @@ oc apply -k ./overlays/03-rhoai-dashboard/
 
 **InstallPlan requires manual approval** — Some operators need an explicit patch. Uncomment and adapt the installplan block in `llmd-script.sh` for your cluster.
 
-**GuideLLM `ThroughputProfile requires a rate parameter`** — GuideLLM ≥0.5 requires `GUIDELLM_RATE` when using the `throughput` profile. This is already set in `guidellm-benchmark-job.yaml`.
+**GuideLLM `Field required (at 'backend.openai_http.target')`** — GuideLLM ≥0.6 uses `guidellm run` with `--backend`, `--data`, and `--profile` CLI flags (not legacy `GUIDELLM_TARGET` / `GUIDELLM_DATA` env vars). Update `LLM_URL` and `LLM_MODEL` in `guidellm-benchmark-job.yaml`, then re-apply overlay `10-guidellm-benchmark`.
 
 **Certificate not issued** — Confirm TLSPolicy issuer matches `oc get clusterissuer` and allow up to 5 minutes for cert-manager to reconcile.
 

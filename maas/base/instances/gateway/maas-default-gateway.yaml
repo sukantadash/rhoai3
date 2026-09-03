@@ -18,14 +18,14 @@ spec:
     - allowedRoutes:
         namespaces:
           from: All
-      hostname: maas.apps.cluster-962vt.962vt.sandbox991.opentlc.com
+      hostname: maas.REPLACE_WITH_CLUSTER_APPS_DOMAIN
       name: http
       port: 80
       protocol: HTTP
     - allowedRoutes:
         namespaces:
           from: All
-      hostname: maas.apps.cluster-962vt.962vt.sandbox991.opentlc.com
+      hostname: maas.REPLACE_WITH_CLUSTER_APPS_DOMAIN
       name: https
       port: 443
       protocol: HTTPS

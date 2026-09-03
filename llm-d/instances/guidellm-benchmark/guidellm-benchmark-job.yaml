@@ -8,29 +8,37 @@ spec:
   template:
     spec:
       restartPolicy: Never
+      serviceAccountName: test-user
       imagePullSecrets:
         - name: ghcr-pull-secret
       containers:
       - name: guidellm
-        image: ghcr.io/vllm-project/guidellm:latest
+        image: ghcr.io/vllm-project/guidellm@sha256:e3ad2371bfa8e42f2c3d1251b62d0d9c9706c27ae2143c8c048eb5fc6aebb558
         env:
-          - name: GUIDELLM_TARGET
-            value: "https://inference-gateway.apps.cluster-bvbpt.bvbpt.sandbox5358.opentlc.com/demo-llm/qwen"
-          - name: GUIDELLM_PROFILE
-            value: throughput
-          - name: GUIDELLM_RATE
-            value: "20"  # max concurrent streams (required by GuideLLM >=0.5 for throughput profile)
-          - name: GUIDELLM_MAX_SECONDS
-            value: "60"
-          # 20 distinct 2048-token prefixes (simulating 20 different large documents/chats)
-          - name: GUIDELLM_DATA
-            value: "prefix_tokens=2048,prefix_count=20,prompt_tokens=100,output_tokens=50"
+          # Update REPLACE_WITH_CLUSTER_APPS_DOMAIN, LLM_URL path, and LLM_MODEL before applying (see llmd-script.sh).
+          - name: LLM_URL
+            value: "https://inference-gateway.REPLACE_WITH_CLUSTER_APPS_DOMAIN/demo-llm/qwen"
+          - name: LLM_MODEL
+            value: "Qwen/Qwen3-0.6B"
           - name: HF_HOME
             value: /tmp/hf-cache
           - name: TRANSFORMERS_CACHE
             value: /tmp/hf-cache
           - name: XDG_CACHE_HOME
             value: /tmp
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            set -euo pipefail
+            TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+            exec guidellm run \
+              --backend "kind=openai_http,target=${LLM_URL},model=${LLM_MODEL},api_key=${TOKEN}" \
+              --data '{"kind":"synthetic_text","prompt_tokens":100,"output_tokens":50,"prefix_buckets":[{"bucket_weight":100,"prefix_count":20,"prefix_tokens":2048}]}' \
+              --profile "kind=throughput,max_concurrency=20" \
+              --constraint "kind=max_duration,seconds=60" \
+              --tokenizer "kind=huggingface_auto,model=${LLM_MODEL}" \
+              --output "kind=json,path=/results/benchmark.json" \
+              --output "kind=csv,path=/results/benchmark.csv"
         volumeMounts:
           - name: cache
             mountPath: /tmp/hf-cache

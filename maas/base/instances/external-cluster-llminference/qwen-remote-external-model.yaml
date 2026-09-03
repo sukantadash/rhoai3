@@ -8,7 +8,7 @@ metadata:
   namespace: ai-models
 spec:
   provider: openai
-  endpoint: qwen-maas.apps.cluster-bvbpt.bvbpt.sandbox5358.opentlc.com
+  endpoint: qwen-maas.REPLACE_WITH_CLUSTER_APPS_DOMAIN
   targetModel: "Qwen/Qwen3-0.6B"
   credentialRef:
     name: qwen-remote-credentials
