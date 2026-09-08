@@ -118,7 +118,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "histogram_quantile(0.50, rate(vllm:time_to_first_token_seconds_bucket{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[5m]))",
+          "expr": "histogram_quantile(0.50, rate(vllm:time_to_first_token_seconds_bucket{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[$__rate_interval]))",
           "interval": "",
           "legendFormat": "P50 TTFT",
           "refId": "A"
@@ -128,7 +128,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "histogram_quantile(0.95, rate(vllm:time_to_first_token_seconds_bucket{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[5m]))",
+          "expr": "histogram_quantile(0.95, rate(vllm:time_to_first_token_seconds_bucket{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[$__rate_interval]))",
           "interval": "",
           "legendFormat": "P95 TTFT",
           "refId": "B"
@@ -138,7 +138,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "histogram_quantile(0.99, rate(vllm:time_to_first_token_seconds_bucket{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[5m]))",
+          "expr": "histogram_quantile(0.99, rate(vllm:time_to_first_token_seconds_bucket{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[$__rate_interval]))",
           "interval": "",
           "legendFormat": "P99 TTFT",
           "refId": "C"
@@ -244,7 +244,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "histogram_quantile(0.50, rate(vllm:time_per_output_token_seconds_bucket{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[5m]))",
+          "expr": "histogram_quantile(0.50, rate(vllm:time_per_output_token_seconds_bucket{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[$__rate_interval]))",
           "interval": "",
           "legendFormat": "P50 Inter-Token",
           "refId": "A"
@@ -254,7 +254,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "histogram_quantile(0.95, rate(vllm:time_per_output_token_seconds_bucket{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[5m]))",
+          "expr": "histogram_quantile(0.95, rate(vllm:time_per_output_token_seconds_bucket{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[$__rate_interval]))",
           "interval": "",
           "legendFormat": "P95 Inter-Token",
           "refId": "B"
@@ -662,7 +662,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "rate(vllm:request_success_total{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[5m])",
+          "expr": "rate(vllm:request_success_total{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[$__rate_interval])",
           "interval": "",
           "legendFormat": "Success Rate",
           "refId": "A"
@@ -672,7 +672,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "rate(vllm:e2e_request_latency_seconds_count{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[5m])",
+          "expr": "rate(vllm:e2e_request_latency_seconds_count{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[$__rate_interval])",
           "interval": "",
           "legendFormat": "Total Rate",
           "refId": "B"
@@ -897,7 +897,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "rate(vllm:prompt_tokens_total{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[5m])",
+          "expr": "rate(vllm:prompt_tokens_total{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[$__rate_interval])",
           "interval": "",
           "legendFormat": "Prompt Tokens/sec",
           "refId": "A"
@@ -907,7 +907,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "rate(vllm:generation_tokens_total{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[5m])",
+          "expr": "rate(vllm:generation_tokens_total{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[$__rate_interval])",
           "interval": "",
           "legendFormat": "Generated Tokens/sec",
           "refId": "B"
@@ -1013,7 +1013,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "histogram_quantile(0.50, rate(vllm:e2e_request_latency_seconds_bucket{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[5m]))",
+          "expr": "histogram_quantile(0.50, rate(vllm:e2e_request_latency_seconds_bucket{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[$__rate_interval]))",
           "interval": "",
           "legendFormat": "P50 E2E",
           "refId": "A"
@@ -1023,7 +1023,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "histogram_quantile(0.95, rate(vllm:e2e_request_latency_seconds_bucket{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[5m]))",
+          "expr": "histogram_quantile(0.95, rate(vllm:e2e_request_latency_seconds_bucket{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[$__rate_interval]))",
           "interval": "",
           "legendFormat": "P95 E2E",
           "refId": "B"
@@ -1033,7 +1033,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "histogram_quantile(0.99, rate(vllm:e2e_request_latency_seconds_bucket{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[5m]))",
+          "expr": "histogram_quantile(0.99, rate(vllm:e2e_request_latency_seconds_bucket{model_name=~\"$model\", kubernetes_namespace=~\"$namespace\"}[$__rate_interval]))",
           "interval": "",
           "legendFormat": "P99 E2E",
           "refId": "C"
@@ -1345,6 +1345,7 @@
         "type": "datasource"
       },
       {
+        "allValue": ".*",
         "current": {
           "text": "All",
           "value": "$__all"
@@ -1353,19 +1354,20 @@
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values(vllm:num_requests_running, model_name)",
+        "definition": "label_values(vllm:kv_cache_usage_perc{job=\"vllm-pods\"}, model_name)",
         "includeAll": true,
         "name": "model",
         "options": [],
         "query": {
-          "query": "label_values(vllm:num_requests_running, model_name)",
+          "query": "label_values(vllm:kv_cache_usage_perc{job=\"vllm-pods\"}, model_name)",
           "refId": "StandardVariableQuery"
         },
-        "refresh": 1,
+        "refresh": 2,
         "regex": "",
         "type": "query"
       },
       {
+        "allValue": ".*",
         "current": {
           "text": "All",
           "value": "$__all"
@@ -1374,20 +1376,21 @@
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values(vllm:num_requests_running,kubernetes_namespace)",
+        "definition": "label_values(vllm:kv_cache_usage_perc{job=\"vllm-pods\"}, kubernetes_namespace)",
         "includeAll": true,
         "name": "namespace",
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(vllm:num_requests_running,kubernetes_namespace)",
+          "query": "label_values(vllm:kv_cache_usage_perc{job=\"vllm-pods\"}, kubernetes_namespace)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
-        "refresh": 1,
+        "refresh": 2,
         "regex": "",
         "type": "query"
       },
       {
+        "allValue": ".*",
         "current": {
           "text": "All",
           "value": "$__all"
@@ -1407,7 +1410,7 @@
           "query": "label_values(inference_pool_ready_pods, name)",
           "refId": "StandardVariableQuery"
         },
-        "refresh": 1,
+        "refresh": 2,
         "regex": "",
         "sort": 1,
         "type": "query"
