@@ -6,6 +6,10 @@ The goal is to prove that llm-d routing, caching, and scheduling features produc
 
 For detailed objectives, pass criteria, and troubleshooting, see [TESTPLAN.md](TESTPLAN.md).
 
+Feature coverage is aligned with the [RHOAI 3.5 llm-d deployment guide](docs/Red_Hat_OpenShift_AI_Self-Managed-3.5-Deploy_models_using_Distributed_Inference_with_llm-d-en-US.pdf) ([online PDF](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.5/pdf/deploy_models_using_distributed_inference_with_llm-d/Red_Hat_OpenShift_AI_Self-Managed-3.5-Deploy_models_using_Distributed_Inference_with_llm-d-en-US.pdf)).
+
+All scenarios use **`RedHatAI/Qwen3-8B-FP8-dynamic`**. Test **00** deploys the default `LLMInferenceService` without custom llm-d scheduler configuration; feature-specific tests (01a onward) add explicit EPP plugins.
+
 ## How it works
 
 ```
@@ -59,6 +63,8 @@ cd rhoai3/llm-d/test
 ./test-script.sh run-all
 ```
 
+`run-all` order: `00 → 01a → 01c → 01d → 01b → 02a → 03a → 03b → 03c → 04a`. Scenarios 01c and 03b/03c reuse the prior deployment without redeploying.
+
 ### Commands
 
 | Command | Description |
@@ -76,17 +82,18 @@ cd rhoai3/llm-d/test
 
 | ID | Scenario | Feature under test | GPUs | Deploy? |
 |---|---|---|---|---|
-| **00** | `00-baseline` | Baseline throughput | 2 | Yes |
-| **01a** | `01a-prefix-cache-routing` | Prefix-cache aware routing | 2 | Yes |
-| **01b** | `01b-queue-kv-scheduling` | Queue + KV utilization scheduling | 2 | No (reuses 01a) |
-| **01c** | `01c-round-robin-control` | Round-robin control (A/B vs 01a) | 2 | Yes |
+| **00** | `00-baseline` | Default deployment (no custom llm-d config) | 2 | Yes |
+| **01a** | `01a-prefix-cache-routing` | Prefix-cache aware routing (`prefix-cache-scorer`) | 2 | Yes |
+| **01b** | `01b-precise-prefix-cache-routing` | Precise prefix-cache routing (`precise-prefix-cache-scorer`) | 2 | Yes |
+| **01c** | `01c-queue-kv-scheduling` | Queue + KV utilization scheduling | 2 | No (reuses 01a) |
+| **01d** | `01d-round-robin-control` | Round-robin control (A/B vs 01a) | 2 | Yes |
 | **02a** | `02a-global-cache-indexing` | Global cache indexing | 2 | Yes |
 | **03a** | `03a-pd-separation` | Prefill/decode separation | 2 | Yes |
 | **03b** | `03b-pd-kv-transfer` | KV direct transfer (NIXL) | 2 | No (reuses 03a) |
 | **03c** | `03c-heterogeneous-pd` | Heterogeneous P/D workloads | 2 | No (reuses 03a) |
-| **04a** | `04a-data-parallelism` | 4-replica data parallelism | 4 | Yes |
+| **04a** | `04a-data-parallelism` | 4-replica throughput scaling | 4 | Yes |
 
-Some scenarios reuse the previous deployment to avoid unnecessary redeploys.
+Some scenarios reuse the previous deployment to avoid unnecessary redeploys (01c after 01a; 03b/03c after 03a).
 
 ## Reading results
 
@@ -95,7 +102,7 @@ After `./test-script.sh run <scenario>` (or `collect`), artifacts land in `<scen
 - **`benchmark.json` / `benchmark.csv`** — GuideLLM metrics (TTFT, ITL, RPS, error rate)
 - **`run-metadata.txt`** — Gateway URL, benchmark time window (use this for Grafana)
 - **`benchmark.log`** — Full GuideLLM output
-- **`prompt.txt`** — LLM prompt template for generating `RESULTS.md`
+- **`prompt.txt`** — LLM prompt template for generating `RESULTS.md` (available for 00, 01a, 01b; use TESTPLAN Results Template for others)
 - **`grafana-page*.png`** — Grafana screenshots (added manually after each run)
 - **`RESULTS.md`** — Test result analysis (generated from prompt + artifacts above)
 
@@ -117,7 +124,7 @@ Inspect `benchmark.csv` and `run-metadata.txt` for throughput, latency, and erro
 
 ### Step 3 — Generate test result analysis with an LLM
 
-Each scenario's `results/` directory includes a **`prompt.txt`** with instructions for analyzing that run. Pass the prompt to an LLM (Cursor, ChatGPT, etc.) together with all test artifacts:
+Scenarios 00, 01a, and 01b include a **`prompt.txt`** with instructions for analyzing that run. For other scenarios, use the Results Template in [TESTPLAN.md](TESTPLAN.md). Pass the prompt to an LLM (Cursor, ChatGPT, etc.) together with all test artifacts:
 
 - `benchmark.csv`
 - `benchmark.json`
@@ -162,5 +169,6 @@ test/
 ## Further reading
 
 - [TESTPLAN.md](TESTPLAN.md) — Detailed steps, pass criteria, troubleshooting
+- [RHOAI 3.5 llm-d deployment guide (PDF)](docs/Red_Hat_OpenShift_AI_Self-Managed-3.5-Deploy_models_using_Distributed_Inference_with_llm-d-en-US.pdf) — Official feature reference
 - [../README.md](../README.md) — Cluster deployment
 - [deferred/README.md](deferred/README.md) — Planned scenarios not yet configured

@@ -1,0 +1,11 @@
+scenario_dir=/Users/sudash/ai-projects/llm-d/rhoai3/llm-d/test/03a-pd-separation
+job_name=guidellm-03a-pd-separation
+namespace=demo-llm
+pod=guidellm-03a-pd-separation-dv76s
+collected_at=2026-09-05T18:01:25Z
+gateway_host=inference-gateway.apps.cluster-nqcv7.nqcv7.sandbox340.opentlc.com
+llm_url=https://inference-gateway.apps.cluster-nqcv7.nqcv7.sandbox340.opentlc.com/demo-llm/qwen-pd
+start_time=2026-09-05T17:23:11Z
+end_time=2026-09-05T17:59:22Z
+files_copied=2
+files_failed=0

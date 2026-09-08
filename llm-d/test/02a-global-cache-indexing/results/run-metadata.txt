@@ -1,0 +1,11 @@
+scenario_dir=/Users/sudash/ai-projects/llm-d/rhoai3/llm-d/test/02a-global-cache-indexing
+job_name=guidellm-02a-global-cache
+namespace=demo-llm
+pod=guidellm-02a-global-cache-xckbx
+collected_at=2026-09-05T15:44:18Z
+gateway_host=inference-gateway.apps.cluster-nqcv7.nqcv7.sandbox340.opentlc.com
+llm_url=https://inference-gateway.apps.cluster-nqcv7.nqcv7.sandbox340.opentlc.com/demo-llm/qwen
+start_time=2026-09-05T15:09:11Z
+end_time=2026-09-05T15:41:17Z
+files_copied=1
+files_failed=1

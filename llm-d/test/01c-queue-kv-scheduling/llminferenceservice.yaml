@@ -6,7 +6,7 @@ metadata:
   annotations:
     security.opendatahub.io/enable-auth: 'false'
 spec:
-  replicas: 4
+  replicas: 2
   model:
     uri: hf://RedHatAI/Qwen3-8B-FP8-dynamic
     name: RedHatAI/Qwen3-8B-FP8-dynamic
@@ -19,7 +19,8 @@ spec:
           plugins:
             - type: queue-scorer
             - type: kv-cache-utilization-scorer
-            - type: precise-prefix-cache-scorer
+            - type: prefix-cache-scorer
+            - type: no-hit-lru-scorer
           schedulingProfiles:
             - name: default
               plugins:
@@ -27,13 +28,19 @@ spec:
                   weight: 2
                 - pluginRef: kv-cache-utilization-scorer
                   weight: 2
-                - pluginRef: precise-prefix-cache-scorer
+                - pluginRef: prefix-cache-scorer
                   weight: 3
+                - pluginRef: no-hit-lru-scorer
+                  weight: 2
     route: {}
     gateway: {}
   template:
     containers:
       - name: main
+        env:
+          - name: VLLM_ADDITIONAL_ARGS
+            value: >-
+              --enable-prefix-caching
         resources:
           limits:
             cpu: '4'

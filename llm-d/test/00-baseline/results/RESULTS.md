@@ -1,27 +1,28 @@
-# Test 00 — Baseline Results
+# Test 00 — Default Baseline Results
 
 **Status:** PASS  
-**Date:** 2026-09-03  
+**Date:** 2026-09-04  
 **Scenario:** `00-baseline`  
-**Model:** Qwen/Qwen3-0.6B  
+**Model:** `RedHatAI/Qwen3-8B-FP8-dynamic`  
 **Replicas:** 2  
-**Gateway:** `https://inference-gateway.REPLACE_WITH_CLUSTER_APPS_DOMAIN/demo-llm/qwen`
+**Gateway:** `https://inference-gateway.apps.cluster-nqcv7.nqcv7.sandbox340.opentlc.com/demo-llm/qwen`
 
 ## Summary
 
-Baseline throughput test completed successfully under random synthetic traffic (no shared prefixes). GuideLLM drove 3,814 successful requests at concurrency 20 over a 60-second measurement window with **0% errors**. Both `qwen` pods were active, EPP reported 2 ready pods with no queue buildup, and KV cache hit rate stayed at 0% — all consistent with the TESTPLAN expectations for a no-prefix baseline.
+GuideLLM completed **1,476 successful requests** at concurrency 20 over a 60-second measurement window with **0% errors** (20 incomplete at `max_duration` cutoff). Both `qwen` pods were active under random synthetic traffic with **no shared prefixes**. Grafana confirms **0% KV cache hit rate** on both pods — expected for this workload. Server-side **TTFT P50 ~47–51 ms** and **~7–12 req/s** sustained throughput establish the baseline floor before feature-specific llm-d scheduler tests (01a onward). All [TESTPLAN.md](../../TESTPLAN.md) pass criteria are met.
 
 ## Test Configuration
 
 | Parameter | Value |
 |---|---|
-| GuideLLM profile | `throughput`, max_concurrency=20 |
+| GuideLLM profile | `throughput`, `max_concurrency=20` |
 | Duration | 60 seconds (`max_duration` constraint) |
 | Data | `synthetic_text`, 100 prompt / 50 output tokens |
 | Prefix buckets | None (random traffic) |
-| EPP plugins | precise-prefix-cache-scorer (3), queue-scorer (2), kv-cache-utilization-scorer (2) |
+| EPP config | Default — `router.scheduler: {}` (no inline `EndpointPickerConfig`) |
+| vLLM | Platform defaults (no `--enable-prefix-caching`) |
 
-Source: `guidellm-job.yaml`, `benchmark.csv` run metadata.
+Source: `guidellm-job.yaml`, `llminferenceservice.yaml`, `benchmark.csv`.
 
 ## Run Window
 
@@ -29,14 +30,14 @@ From `run-metadata.txt`:
 
 | | Timestamp (UTC) |
 |---|---|
-| Job start | 2026-09-03T15:34:35Z |
-| Job end | 2026-09-03T15:35:54Z |
-| GuideLLM measure window | 2026-09-03T15:34:48Z → 15:35:48Z (60 s) |
-| Results collected | 2026-09-03T15:36:01Z |
-| Job pod | `guidellm-00-baseline-lq294` |
+| Job start | 2026-09-04T23:50:28Z |
+| Job end | 2026-09-04T23:51:52Z |
+| GuideLLM measure window | 2026-09-04T23:50:47Z → 23:51:47Z (60 s) |
+| Results collected | 2026-09-04T23:51:55Z |
+| Job pod | `guidellm-00-baseline-cg4mh` |
 | Namespace | `demo-llm` |
 
-Grafana screenshots use local time **08:34:35 → 08:35:54** (UTC−7), matching the job window above.
+Set Grafana time range to the measure window above when reviewing dashboard panels.
 
 ## GuideLLM Results
 
@@ -44,123 +45,96 @@ From `benchmark.csv` summary row:
 
 | Metric | Value |
 |---|---|
-| Requests successful | 3,814 |
-| Requests incomplete | 18 (stopped at max_duration) |
+| Requests successful | 1,476 |
+| Requests incomplete | 20 (stopped at max_duration) |
 | Requests errored | 0 |
-| Error rate | 0% |
-| Throughput (RPS) | 63.5 req/s (mean) |
+| Error rate | **0%** |
+| Throughput (RPS) | **24.6 req/s** (mean), 3.3 (median bucket) |
 | Concurrency | 20 (median) |
-| TTFT p50 | 63 ms |
-| TTFT mean | 67 ms |
-| ITL p50 | 5.0 ms |
-| ITL mean | 5.0 ms |
-| E2E latency mean | 313 ms |
+| TTFT p50 | **51.0 ms** |
+| TTFT mean | 55.5 ms |
+| ITL p50 | **16.1 ms** |
+| ITL mean | 16.2 ms |
+| E2E latency mean | 801 ms |
 | Input tokens / request | 108 (mean) |
-| Output tokens / request | 50 (mean) |
-| Input tokens/s | 6,919 |
-| Output tokens/s | 3,190 |
-| Total tokens/s | 10,081 |
-
-**Note:** Warm vs cold TTFT is N/A for this scenario — there are no shared prefix buckets, so every prompt is unique.
+| Output tokens / request | 50 |
+| Input tokens/s | 2,695 (mean) |
+| Output tokens/s | 1,232 (mean) |
 
 ## Grafana Observations
 
-Time range: 2026-09-03 08:34:35 → 08:35:54 (local)
+### Page 1 — LLM Performance Dashboard
+
+Save screenshots as `grafana-page1.png` in this directory to embed below:
+
+![Grafana LLM Performance Dashboard — page 1](./grafana-page1.png)
 
 | Panel | Observation |
 |---|---|
-| TTFT P50 | ~32 ms (server-side); stabilizes after initial ramp |
-| Inter-Token Latency | No data (dashboard panel empty for this run) |
-| KV Cache Hit Rate | 0% — expected (no shared prefixes) |
-| Per-Pod Cache Hit Rates | 0% on both pods |
-| GPU Cache Usage | ~0% — short prompts on small model |
-| Request Throughput | Ramps to ~6–7 req/s per series as concurrency fills |
-| Request Queue | Running peaks at 20; waiting stays at 0 |
-| EPP Ready Pods | 2 (`qwen-kserve-84d65b77d8-lqr4b-rank-0`, `...-whp9d-rank-0`) |
-| EPP Queue Size | 0 on both pods |
-| EPP KV Cache Utilization | 0% |
-| Token Processing Rate | ~324 tps + ~317 tps at peak (both pods active) |
-| E2E Latency P50 | ~242–250 ms |
+| TTFT P50 | **46.7–45.7 ms** (last), **51–59 ms** (mean) across replicas |
+| TTFT P95 | **59.0–59.2 ms** (last), **68–98 ms** (mean) |
+| TTFT P99 | **68.8–71.1 ms** (last), **87–121 ms** (mean) |
+| Inter-Token Latency | No data (panel empty for this run) |
+| KV Cache Hit Rate | **0%** — expected with random traffic, no shared prefixes |
+| Per-Pod Cache Hit Rates | **Pod `qwen-kserve-6cccd699cd-zxcl5`: 0%**, **Pod `qwen-kserve-6cccd699cd-zrnn9`: 0%** |
+| GPU Cache Usage % | **0.000** on both pods |
+| Per-Pod GPU Cache Usage | **0.000** on both pods |
+| Request Throughput | Success rate **~11.4–11.9 req/s** (last), **~7.4–7.8 req/s** (mean); total rate matches |
+| Request Queue Status | Running **0**, Waiting **0** — no backlog at end of run |
 
-### Grafana Screenshots
+Both pods appear in per-pod panels, confirming traffic reached both replicas.
 
-**Page 1** — TTFT, inter-token latency, KV cache hit rate, GPU cache usage, request throughput, request queue status
+### Page 2 — Token Rate, E2E Latency, EPP Health
 
-![Grafana page 1: TTFT, cache, throughput, and queues](graphana-page1.png)
+Save screenshots as `grafana-page2.png` in this directory to embed below:
 
-**Page 2** — Token processing rate, end-to-end latency, EPP pool health, KV cache utilization, per-pod queue sizes
+![Grafana LLM Performance Dashboard — page 2](./grafana-page2.png)
 
-![Grafana page 2: tokens, E2E latency, and EPP health](grafana-page2.png)
+| Panel | Observation |
+|---|---|
+| Prompt Tokens/sec | **1,210–1,289 tps** (last), **812–850 tps** (mean) |
+| Generated Tokens/sec | **558–596 tps** (last), **372–392 tps** (mean) |
+| E2E Latency P50 | **688–689 ms** (last), **749–766 ms** (mean) |
+| E2E Latency P95 | **951 ms** (last), **966–974 ms** (mean) |
+| E2E Latency P99 | **990 ms** (last), **993–995 ms** (mean) |
+| E2E Latency Average | **799–801 ms** |
+| EPP Pool Health & Load | No data |
+| EPP KV Cache Pool Utilization | No data |
+| Per-Pod Queue Sizes (EPP View) | No data |
+
+**Note:** EPP-specific panels reported no data for this default deployment run. This is not a TESTPLAN pass/fail criterion for Test 00. vLLM-side metrics (TTFT, throughput, queue status) are sufficient to validate the baseline.
 
 ## TESTPLAN Validation
 
-Per [TESTPLAN.md](../../TESTPLAN.md) — Test 00 Baseline Throughput:
+Per [TESTPLAN.md](../../TESTPLAN.md) — Test 00 Default Baseline (No Custom llm-d Config):
 
-| TESTPLAN expected result | Evidence | Result |
+| Pass criterion | Evidence | Result |
 |---|---|---|
-| Gateway returns HTTP 200 | Smoke test passed before benchmark; 0 errored requests in `benchmark.csv` | **PASS** |
-| GuideLLM error rate < 1% | 0 / 3,832 requests errored (0%) | **PASS** |
-| Both `qwen` pods receive traffic | Grafana token processing ~324 tps on one pod, ~317 tps on the other; both pods listed in per-pod panels | **PASS** |
-| `up{job="llm-d-epp-metrics"} == 1` | EPP Pool Health shows 2 ready pods throughout run; per-pod queue and cache panels populated | **PASS** (inferred) |
-| No `EPPNoReadyPods` alert | EPP ready count stable at 2; no queue buildup or pod loss observed | **PASS** (inferred) |
-| Benchmark completes | Job finished; `benchmark.json`, `benchmark.csv`, `benchmark.log` collected (`files_copied=2` in run-metadata) | **PASS** |
-| Baseline metrics recorded | Full summary in `benchmark.csv` / `benchmark.json` | **PASS** |
+| Benchmark completes | 1,476 successful + 20 incomplete at duration limit; job pod exited cleanly | **PASS** |
+| Baseline metrics recorded | `benchmark.json`, `benchmark.csv`, `run-metadata.txt` present | **PASS** |
+| GuideLLM error rate < 1% | 0 errored / 1,496 total = **0%** | **PASS** |
+| Both `qwen` pods receive traffic | Two distinct pod names in Grafana per-pod panels | **PASS** |
+| KV cache hit rate ~0% | Aggregate and per-pod hit rate **0%** under random traffic | **PASS** |
+| Gateway returns HTTP 200 | 0% error rate; 1,476 successful completions | **PASS** |
 
-**Overall: PASS**
+## Analysis
 
-## Results Template (from TESTPLAN)
+**Throughput:** GuideLLM mean RPS of **24.6 req/s** (client-side, concurrency 20) and Grafana success rate of **~7–12 req/s** (server-side scrape window) both indicate healthy sustained load. The difference reflects aggregation windows and client vs server measurement points — both confirm the service handled concurrent random traffic without errors.
 
-```
-Test ID:           00-baseline
-Date / Cluster:    2026-09-03 / REPLACE_WITH_CLUSTER_APPS_DOMAIN
-Gateway URL:       https://inference-gateway.REPLACE_WITH_CLUSTER_APPS_DOMAIN/demo-llm/qwen
-Duration:          60 s (measure window)
+**Latency:** Server-side **TTFT P50 ~47–51 ms** on the 8B FP8 model sets the latency floor for later feature tests. **E2E P50 ~688–749 ms** reflects full request lifecycle (prefill + 50-token decode) at concurrency 20.
 
-GuideLLM Results:
-  - TTFT p50 (cold):  N/A (no prefix buckets)
-  - TTFT p50 (warm):  N/A (no prefix buckets)
-  - ITL p50:          5.0 ms
-  - RPS:              63.5
-  - Error rate:       0%
+**Caching:** **0% KV cache hit rate** is correct — Test 00 uses random synthetic prompts with no shared prefix buckets. The default platform scheduler is active but has nothing cache-affine to route on.
 
-Prometheus/Grafana:
-  - KV cache hit rate peak:  0%
-  - EPP pool ready pods:     2
-  - Alerts fired:            none observed
-
-PASS / FAIL:  PASS
-Notes:        0% KV hit rate and balanced token throughput across both pods
-              confirm random traffic with no prefix affinity. Use these metrics
-              as the reference for Tests 01a, 01b, 01c, and 04a.
-```
-
-## Interpretation
-
-This baseline establishes reference performance for random synthetic traffic with no prefix affinity:
-
-- **Throughput:** ~63.5 req/s at concurrency 20 is the reference RPS for later scaling comparisons (e.g. Test 04a expects ~1.5–2×).
-- **Latency:** TTFT p50 ~63 ms (client) / ~32 ms (server-side Grafana) and E2E p50 ~242–250 ms set the latency floor.
-- **Cache:** 0% KV hit rate is expected — the precise-prefix-cache scorer has nothing to route on without shared prefixes.
-- **Load balancing:** Both replicas are active with no EPP queue buildup, indicating the stack handles concurrency 20 comfortably on 2 GPUs.
-
-## Comparison Reference
-
-Use these values when evaluating later tests:
-
-| Test | Expected change vs baseline |
-|---|---|
-| 01a Prefix-cache | TTFT drops on warm prefixes; KV hit rate > 0%; one pod dominates cache |
-| 01b Queue/KV spillover | Queues on both pods under concurrency=80; secondary pod cache rises |
-| 01c Round-robin control | Higher TTFT, lower cache hit rate than 01a |
-| 04a Data parallelism (4 rep) | ~1.5–2× throughput vs 63.5 req/s |
+**Baseline role:** These numbers are the reference point for Test 04a (4-replica scaling should show ~1.5–2× RPS) and for contrasting Test 01a (where prefix-cache routing should dramatically improve warm-prefix TTFT and cache hit rate).
 
 ## Artifacts
 
 | File | Description |
 |---|---|
-| `benchmark.json` | Full GuideLLM run data (gitignored — large) |
-| `benchmark.csv` | Summary statistics |
-| `benchmark.log` | GuideLLM console output (gitignored — large) |
-| `run-metadata.txt` | Collection metadata and time window |
-| `graphana-page1.png` | Grafana: TTFT, cache, throughput, queues |
-| `grafana-page2.png` | Grafana: tokens, E2E latency, EPP health |
+| `benchmark.csv` | GuideLLM summary metrics |
+| `benchmark.json` | Full GuideLLM run record |
+| `benchmark.log` | Complete GuideLLM stdout |
+| `run-metadata.txt` | Gateway URL and time window |
+| `prompt.txt` | LLM analysis prompt template |
+| `grafana-page1.png` | *(add manually)* TTFT, cache, throughput panels |
+| `grafana-page2.png` | *(add manually)* Token rate, E2E latency panels |

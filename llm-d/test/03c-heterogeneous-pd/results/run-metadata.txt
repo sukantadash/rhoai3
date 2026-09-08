@@ -1,0 +1,11 @@
+scenario_dir=/Users/sudash/ai-projects/llm-d/rhoai3/llm-d/test/03c-heterogeneous-pd
+job_name=guidellm-03c-heterogeneous-pd
+namespace=demo-llm
+pod=guidellm-03c-heterogeneous-pd-w5p6t
+collected_at=2026-09-08T17:20:44Z
+gateway_host=inference-gateway.apps.cluster-nqcv7.nqcv7.sandbox340.opentlc.com
+llm_url=https://inference-gateway.apps.cluster-nqcv7.nqcv7.sandbox340.opentlc.com/demo-llm/qwen-pd
+start_time=2026-09-08T16:38:53Z
+end_time=2026-09-08T17:13:42Z
+files_copied=1
+files_failed=1

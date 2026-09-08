@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: guidellm-01b-queue-kv
+  name: guidellm-01d-round-robin
   namespace: demo-llm
 spec:
   backoffLimit: 0
@@ -32,8 +32,8 @@ spec:
             TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
             guidellm run \
               --backend "kind=openai_http,target=${LLM_URL},model=${LLM_MODEL},api_key=${TOKEN}" \
-              --data '{"kind":"synthetic_text","prompt_tokens":50,"output_tokens":128,"prefix_buckets":[{"bucket_weight":100,"prefix_count":1,"prefix_tokens":2048}]}' \
-              --profile "kind=exact,concurrency=80" \
+              --data '{"kind":"synthetic_text","prompt_tokens":50,"output_tokens":50,"prefix_buckets":[{"bucket_weight":100,"prefix_count":1,"prefix_tokens":2048}]}' \
+              --profile "kind=constant,rate=5" \
               --constraint "kind=max_duration,seconds=120" \
               --tokenizer "kind=huggingface_auto,model=${LLM_MODEL}" \
               --output "kind=json,path=/results/benchmark.json" \

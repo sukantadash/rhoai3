@@ -1,0 +1,11 @@
+scenario_dir=/Users/sudash/ai-projects/llm-d/rhoai3/llm-d/test/01c-queue-kv-scheduling
+job_name=guidellm-01c-queue-kv
+namespace=demo-llm
+pod=guidellm-01c-queue-kv-gk9bs
+collected_at=2026-09-08T15:34:34Z
+gateway_host=inference-gateway.apps.cluster-nqcv7.nqcv7.sandbox340.opentlc.com
+llm_url=https://inference-gateway.apps.cluster-nqcv7.nqcv7.sandbox340.opentlc.com/demo-llm/qwen
+start_time=2026-09-08T15:31:49Z
+end_time=2026-09-08T15:34:10Z
+files_copied=2
+files_failed=0

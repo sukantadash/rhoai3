@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: guidellm-01c-round-robin
+  name: guidellm-01b-precise-prefix-cache
   namespace: demo-llm
 spec:
   backoffLimit: 0

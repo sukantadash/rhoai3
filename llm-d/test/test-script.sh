@@ -3,12 +3,12 @@
 #
 # Usage:
 #   ./test-script.sh setup
-#   ./test-script.sh run <scenario>
-#   ./test-script.sh run-all
-#   ./test-script.sh deploy <scenario>
-#   ./test-script.sh benchmark <scenario>
-#   ./test-script.sh collect <scenario>
-#   ./test-script.sh cleanup <scenario>
+#   ./test-script.sh run <scenario> [scenario ...] [--cleanup]
+#   ./test-script.sh run-all [--cleanup]
+#   ./test-script.sh deploy <scenario> [scenario ...]
+#   ./test-script.sh benchmark <scenario> [scenario ...]
+#   ./test-script.sh collect <scenario> [scenario ...]
+#   ./test-script.sh cleanup <scenario> [scenario ...]
 #   ./test-script.sh cleanup-all
 
 set -euo pipefail
@@ -21,23 +21,39 @@ source "${SCRIPT_DIR}/common/collect-results.sh"
 
 usage() {
   cat <<EOF
-Usage: $(basename "$0") <command> [scenario]
+Usage: $(basename "$0") [options] <command> [scenario ...]
+
+Options:
+  --cleanup          Remove LLMInferenceService after run / run-all (default: keep running)
 
 Commands:
   setup              Verify cluster access, gateway, and monitoring
-  run <scenario>     Deploy model, run benchmark, collect results, cleanup job and LLMInferenceService
-  run-all            Run all scenarios (undeploy LLMInferenceService only at the end)
-  deploy <scenario>  Apply llminferenceservice.yaml and wait for Ready
-  benchmark <scenario>  Apply guidellm-job.yaml and wait for completion
-  collect <scenario> Copy benchmark results to scenario/results/
-  cleanup <scenario> Delete guidellm job for scenario
-  cleanup-all        Delete all test jobs and LLMInferenceServices
+  run <scenario>...  Deploy model, run benchmark, collect results, delete job
+  run-all            Run all scenarios in order
+  deploy <scenario>...  Apply llminferenceservice.yaml and wait for Ready
+  benchmark <scenario>...  Apply guidellm-job.yaml and wait for completion
+  collect <scenario>...  Copy benchmark results to scenario/results/
+  cleanup <scenario>...  Delete guidellm job for scenario
+  cleanup-all        Delete all test jobs; add --cleanup to also remove LLMInferenceServices
+
+Scenarios accept short IDs (00, 01a, 04a) or full directory names (00-baseline).
+
+By default, run keeps the LLMInferenceService running so follow-on scenarios
+(e.g. 01c reusing 01a) can proceed without redeploying.
+
+Examples:
+  $(basename "$0") run 00-baseline
+  $(basename "$0") run 00 01a 04a
+  $(basename "$0") run 00-baseline --cleanup
+  $(basename "$0") --cleanup run-all
+  CLEANUP_LLM=true $(basename "$0") run 01a-prefix-cache-routing
 
 Scenarios:
   00-baseline
   01a-prefix-cache-routing
-  01b-queue-kv-scheduling
-  01c-round-robin-control
+  01b-precise-prefix-cache-routing
+  01c-queue-kv-scheduling
+  01d-round-robin-control
   02a-global-cache-indexing
   03a-pd-separation
   03b-pd-kv-transfer
@@ -46,12 +62,84 @@ Scenarios:
 EOF
 }
 
+resolve_scenario() {
+  local input="${1:-}"
+  if [[ -z "${input}" ]]; then
+    echo "ERROR: Missing scenario" >&2
+    return 1
+  fi
+
+  if [[ -d "${SCRIPT_DIR}/${input}" ]]; then
+    echo "${input}"
+    return 0
+  fi
+
+  local -a matches=()
+  local scenario
+  for scenario in "${RUN_ALL_SCENARIOS[@]}"; do
+    if [[ "${scenario}" == "${input}" || "${scenario}" == "${input}-"* ]]; then
+      matches+=("${scenario}")
+    fi
+  done
+
+  if [[ ${#matches[@]} -eq 1 ]]; then
+    echo "${matches[0]}"
+    return 0
+  fi
+
+  if [[ ${#matches[@]} -gt 1 ]]; then
+    echo "ERROR: Ambiguous scenario '${input}': ${matches[*]}" >&2
+    return 1
+  fi
+
+  echo "ERROR: Unknown scenario: ${input}" >&2
+  return 1
+}
+
 require_scenario() {
   local scenario="${1:-}"
-  if [[ -z "${scenario}" || ! -d "${SCRIPT_DIR}/${scenario}" ]]; then
-    echo "ERROR: Unknown or missing scenario: ${scenario}" >&2
+  resolve_scenario "${scenario}" >/dev/null || {
     usage
     exit 1
+  }
+}
+
+resolve_scenarios() {
+  local -a resolved=()
+  local input scenario
+  for input in "$@"; do
+    scenario="$(resolve_scenario "${input}")" || return 1
+    resolved+=("${scenario}")
+  done
+  printf '%s\n' "${resolved[@]}"
+}
+
+require_scenarios() {
+  if [[ $# -eq 0 ]]; then
+    echo "ERROR: At least one scenario is required" >&2
+    usage
+    exit 1
+  fi
+  resolve_scenarios "$@" || {
+    usage
+    exit 1
+  }
+}
+
+print_scenario_banner() {
+  local scenario="${1}"
+  echo ""
+  echo "=========================================="
+  echo " Running scenario: ${scenario}"
+  echo "=========================================="
+}
+
+cleanup_llm_services() {
+  if [[ "${CLEANUP_LLM}" == "true" ]]; then
+    undeploy_llm_service qwen || true
+    undeploy_llm_service qwen-pd || true
+  else
+    echo "==> Keeping LLMInferenceServices running (pass --cleanup to remove)"
   fi
 }
 
@@ -131,6 +219,11 @@ undeploy_scenario() {
   undeploy_llm_service "${service}"
 }
 
+llm_service_exists() {
+  local service="${1}"
+  oc get llminferenceservice "${service}" -n "${LLM_NAMESPACE}" >/dev/null 2>&1
+}
+
 deploy_scenario() {
   local scenario="${1}"
   local scenario_dir="${SCRIPT_DIR}/${scenario}"
@@ -138,9 +231,22 @@ deploy_scenario() {
   service="$(scenario_llm_service "${scenario}")"
 
   if ! scenario_needs_deploy "${scenario}"; then
-    echo "==> Skipping deploy for ${scenario} (reuses existing ${service})"
-    oc wait --for=condition=Ready "llminferenceservice/${service}" \
-      -n "${LLM_NAMESPACE}" --timeout=600s
+    if llm_service_exists "${service}"; then
+      echo "==> Skipping deploy for ${scenario} (reuses existing ${service})"
+      oc wait --for=condition=Ready "llminferenceservice/${service}" \
+        -n "${LLM_NAMESPACE}" --timeout=600s
+      return 0
+    fi
+
+    local prereq
+    if ! prereq="$(scenario_deploy_prerequisite "${scenario}")"; then
+      echo "ERROR: ${scenario} reuses ${service}, but ${service} is not deployed." >&2
+      echo "Run the prerequisite scenario first (see TESTPLAN.md)." >&2
+      exit 1
+    fi
+
+    echo "==> ${service} not found; deploying prerequisite ${prereq} for ${scenario}..."
+    deploy_scenario "${prereq}"
     return 0
   fi
 
@@ -173,6 +279,7 @@ render_guidellm_job() {
   local rendered="${scenario_dir}/.guidellm-job.rendered.yaml"
 
   LLM_URL="$(llm_url "${service}")"
+  LLM_MODEL="$(scenario_llm_model "${scenario}")"
 
   render_template "${scenario_dir}/guidellm-job.yaml" "${rendered}"
   echo "${rendered}"
@@ -201,7 +308,7 @@ benchmark_scenario() {
 
 run_scenario() {
   local scenario="${1}"
-  local skip_undeploy="${2:-false}"
+  local defer_llm_cleanup="${2:-false}"
   require_scenario "${scenario}"
 
   deploy_scenario "${scenario}"
@@ -210,8 +317,28 @@ run_scenario() {
   collect_results "${SCRIPT_DIR}/${scenario}" "$(scenario_job_name "${scenario}")" "${LLM_NAMESPACE}"
   cleanup_scenario "${scenario}"
 
-  if [[ "${skip_undeploy}" != "true" ]]; then
+  if [[ "${CLEANUP_LLM}" == "true" && "${defer_llm_cleanup}" != "true" ]]; then
     undeploy_scenario "${scenario}"
+  else
+    echo "==> Keeping LLMInferenceService $(scenario_llm_service "${scenario}") running (pass --cleanup to remove)"
+  fi
+}
+
+run_scenarios() {
+  local -a scenarios=("$@")
+  local scenario
+  local defer_llm_cleanup="false"
+  if [[ ${#scenarios[@]} -gt 1 && "${CLEANUP_LLM}" == "true" ]]; then
+    defer_llm_cleanup="true"
+  fi
+
+  for scenario in "${scenarios[@]}"; do
+    print_scenario_banner "${scenario}"
+    run_scenario "${scenario}" "${defer_llm_cleanup}"
+  done
+
+  if [[ "${defer_llm_cleanup}" == "true" ]]; then
+    cleanup_llm_services
   fi
 }
 
@@ -229,35 +356,84 @@ cleanup_all() {
   for scenario in "${RUN_ALL_SCENARIOS[@]}"; do
     cleanup_scenario "${scenario}" || true
   done
-  undeploy_llm_service qwen || true
-  undeploy_llm_service qwen-pd || true
+  cleanup_llm_services
+}
+
+parse_args() {
+  local -a remaining=()
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --cleanup)
+        CLEANUP_LLM=true
+        shift
+        ;;
+      -h|--help|help)
+        remaining=("help")
+        shift
+        ;;
+      *)
+        remaining+=("$1")
+        shift
+        ;;
+    esac
+  done
+  printf '%s\n' "${remaining[@]}"
 }
 
 main() {
-  local cmd="${1:-}"
-  local scenario="${2:-}"
+  local -a args=()
+  local -a scenarios=()
+  local cmd scenario line
+
+  while IFS= read -r line; do
+    args+=("${line}")
+  done < <(parse_args "$@")
+
+  cmd="${args[0]:-}"
+  if ((${#args[@]} > 1)); then
+    scenarios=("${args[@]:1}")
+  fi
 
   case "${cmd}" in
     setup) setup ;;
-    run) require_scenario "${scenario}"; run_scenario "${scenario}" ;;
+    run)
+      scenarios=($(require_scenarios "${scenarios[@]}"))
+      run_scenarios "${scenarios[@]}"
+      ;;
     run-all)
       setup
-      for s in "${RUN_ALL_SCENARIOS[@]}"; do
-        echo ""
-        echo "=========================================="
-        echo " Running scenario: ${s}"
-        echo "=========================================="
-        run_scenario "${s}" "true"
-      done
-      undeploy_llm_service qwen || true
-      undeploy_llm_service qwen-pd || true
+      run_scenarios "${RUN_ALL_SCENARIOS[@]}"
       ;;
-    deploy) require_scenario "${scenario}"; deploy_scenario "${scenario}" ;;
-    benchmark) require_scenario "${scenario}"; benchmark_scenario "${scenario}" ;;
-    collect) require_scenario "${scenario}"; collect_results "${SCRIPT_DIR}/${scenario}" "$(scenario_job_name "${scenario}")" "${LLM_NAMESPACE}" ;;
-    cleanup) require_scenario "${scenario}"; cleanup_scenario "${scenario}" ;;
+    deploy)
+      scenarios=($(require_scenarios "${scenarios[@]}"))
+      for scenario in "${scenarios[@]}"; do
+        print_scenario_banner "${scenario}"
+        deploy_scenario "${scenario}"
+      done
+      ;;
+    benchmark)
+      scenarios=($(require_scenarios "${scenarios[@]}"))
+      for scenario in "${scenarios[@]}"; do
+        print_scenario_banner "${scenario}"
+        benchmark_scenario "${scenario}"
+      done
+      ;;
+    collect)
+      scenarios=($(require_scenarios "${scenarios[@]}"))
+      for scenario in "${scenarios[@]}"; do
+        print_scenario_banner "${scenario}"
+        collect_results "${SCRIPT_DIR}/${scenario}" "$(scenario_job_name "${scenario}")" "${LLM_NAMESPACE}"
+      done
+      ;;
+    cleanup)
+      scenarios=($(require_scenarios "${scenarios[@]}"))
+      for scenario in "${scenarios[@]}"; do
+        print_scenario_banner "${scenario}"
+        cleanup_scenario "${scenario}"
+      done
+      ;;
     cleanup-all) cleanup_all ;;
-    -h|--help|help|"") usage ;;
+    help|"") usage ;;
     *) echo "ERROR: Unknown command: ${cmd}" >&2; usage; exit 1 ;;
   esac
 }

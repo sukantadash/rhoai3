@@ -2,7 +2,13 @@
 # Shared environment for llm-d feature tests.
 
 LLM_NAMESPACE="${LLM_NAMESPACE:-demo-llm}"
-LLM_MODEL="${LLM_MODEL:-Qwen/Qwen3-0.6B}"
+LLM_MODEL="${LLM_MODEL:-RedHatAI/Qwen3-8B-FP8-dynamic}"
+# Set CLEANUP_LLM=true or pass --cleanup to remove LLMInferenceService after a run.
+CLEANUP_LLM="${CLEANUP_LLM:-false}"
+
+scenario_llm_model() {
+  echo "${LLM_MODEL}"
+}
 MONITORING_NS="${MONITORING_NS:-llm-d-monitoring}"
 GUIDELLM_IMAGE="${GUIDELLM_IMAGE:-ghcr.io/vllm-project/guidellm@sha256:e3ad2371bfa8e42f2c3d1251b62d0d9c9706c27ae2143c8c048eb5fc6aebb558}"
 
@@ -31,8 +37,9 @@ render_template() {
 
 scenario_llm_service() {
   case "$1" in
-    00-baseline|01a-prefix-cache-routing|01b-queue-kv-scheduling|\
-    01c-round-robin-control|02a-global-cache-indexing|04a-data-parallelism)
+    00-baseline|01a-prefix-cache-routing|01b-precise-prefix-cache-routing|\
+    01c-queue-kv-scheduling|01d-round-robin-control|02a-global-cache-indexing|\
+    04a-data-parallelism)
       echo "qwen"
       ;;
     03a-pd-separation|03b-pd-kv-transfer|03c-heterogeneous-pd)
@@ -48,8 +55,9 @@ scenario_job_name() {
   case "$1" in
     00-baseline) echo "guidellm-00-baseline" ;;
     01a-prefix-cache-routing) echo "guidellm-01a-prefix-cache" ;;
-    01b-queue-kv-scheduling) echo "guidellm-01b-queue-kv" ;;
-    01c-round-robin-control) echo "guidellm-01c-round-robin" ;;
+    01b-precise-prefix-cache-routing) echo "guidellm-01b-precise-prefix-cache" ;;
+    01c-queue-kv-scheduling) echo "guidellm-01c-queue-kv" ;;
+    01d-round-robin-control) echo "guidellm-01d-round-robin" ;;
     02a-global-cache-indexing) echo "guidellm-02a-global-cache" ;;
     03a-pd-separation) echo "guidellm-03a-pd-separation" ;;
     03b-pd-kv-transfer) echo "guidellm-03b-pd-kv-transfer" ;;
@@ -62,11 +70,12 @@ scenario_job_name() {
 # Returns 0 if deploy is needed, 1 if deploy should be skipped.
 scenario_needs_deploy() {
   case "$1" in
-    01b-queue-kv-scheduling|03b-pd-kv-transfer|03c-heterogeneous-pd)
+    01c-queue-kv-scheduling|03b-pd-kv-transfer|03c-heterogeneous-pd)
       return 1
       ;;
-    00-baseline|01a-prefix-cache-routing|01c-round-robin-control|\
-    02a-global-cache-indexing|03a-pd-separation|04a-data-parallelism)
+    00-baseline|01a-prefix-cache-routing|01b-precise-prefix-cache-routing|\
+    01d-round-robin-control|02a-global-cache-indexing|03a-pd-separation|\
+    04a-data-parallelism)
       return 0
       ;;
     *)
@@ -75,11 +84,21 @@ scenario_needs_deploy() {
   esac
 }
 
+# Base deployment to apply when a reuse scenario runs without its service present.
+scenario_deploy_prerequisite() {
+  case "$1" in
+    01c-queue-kv-scheduling) echo "01a-prefix-cache-routing" ;;
+    03b-pd-kv-transfer|03c-heterogeneous-pd) echo "03a-pd-separation" ;;
+    *) return 1 ;;
+  esac
+}
+
 RUN_ALL_SCENARIOS=(
   00-baseline
   01a-prefix-cache-routing
-  01b-queue-kv-scheduling
-  01c-round-robin-control
+  01c-queue-kv-scheduling
+  01d-round-robin-control
+  01b-precise-prefix-cache-routing
   02a-global-cache-indexing
   03a-pd-separation
   03b-pd-kv-transfer

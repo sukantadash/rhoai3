@@ -1,0 +1,11 @@
+scenario_dir=/Users/sudash/ai-projects/llm-d/rhoai3/llm-d/test/04a-data-parallelism
+job_name=guidellm-04a-data-parallelism
+namespace=demo-llm
+pod=guidellm-04a-data-parallelism-2vftn
+collected_at=2026-09-08T17:27:21Z
+gateway_host=inference-gateway.apps.cluster-nqcv7.nqcv7.sandbox340.opentlc.com
+llm_url=https://inference-gateway.apps.cluster-nqcv7.nqcv7.sandbox340.opentlc.com/demo-llm/qwen
+start_time=2026-09-08T17:24:52Z
+end_time=2026-09-08T17:27:13Z
+files_copied=2
+files_failed=0

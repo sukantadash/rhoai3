@@ -1,0 +1,1391 @@
+{
+  "00-baseline": {
+    "window": {
+      "start": "2026-09-08 15:24:36",
+      "end": "2026-09-08 15:25:36"
+    },
+    "vllm": {
+      "ttft_p50": {
+        "aggregate": {
+          "last": 0.04746037528719517,
+          "mean": 0.047629120657943363,
+          "min": 0.04746037528719517,
+          "max": 0.04779786602869156
+        }
+      },
+      "ttft_p95": {
+        "aggregate": {
+          "last": 0.06206081493842768,
+          "mean": 0.06728710096206814,
+          "min": 0.06206081493842768,
+          "max": 0.0725133869857086
+        }
+      },
+      "ttft_p99": {
+        "aggregate": {
+          "last": 0.141911809397572,
+          "mean": 0.16967727976094382,
+          "min": 0.141911809397572,
+          "max": 0.1974427501243156
+        }
+      },
+      "kv_hit_rate": {
+        "aggregate": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "per_pod_hit_rate": {
+        "qwen-kserve-6cccd699cd-l7dl7": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "qwen-kserve-6cccd699cd-xpbnk": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "gpu_cache": {
+        "qwen-kserve-6cccd699cd-l7dl7": {
+          "last": 0.7843983880253314,
+          "mean": 0.4797543657647285,
+          "min": 0.0,
+          "max": 0.7843983880253314
+        },
+        "qwen-kserve-6cccd699cd-xpbnk": {
+          "last": 0.6766971420344103,
+          "mean": 0.44153288700117627,
+          "min": 0.0,
+          "max": 0.6766971420344103
+        }
+      },
+      "req_throughput": {
+        "aggregate": {
+          "last": 11.98728543478261,
+          "mean": 5.923704432806325,
+          "min": 0.0,
+          "max": 11.98728543478261
+        }
+      },
+      "per_pod_throughput": {
+        "qwen-kserve-6cccd699cd-l7dl7": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "qwen-kserve-6cccd699cd-xpbnk": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "queue_running": {
+        "aggregate": {
+          "last": 21.0,
+          "mean": 13.666666666666666,
+          "min": 0.0,
+          "max": 21.0
+        }
+      },
+      "queue_waiting": {
+        "aggregate": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "prompt_tps": {
+        "aggregate": {
+          "last": 1313.7999260869565,
+          "mean": 652.2792226956522,
+          "min": 0.0,
+          "max": 1313.7999260869565
+        }
+      },
+      "gen_tps": {
+        "aggregate": {
+          "last": 606.1229038405797,
+          "mean": 300.2298249266579,
+          "min": 0.0,
+          "max": 606.1229038405797
+        }
+      },
+      "e2e_p50": {
+        "aggregate": {
+          "last": 0.7320607360342232,
+          "mean": 0.7410218735562426,
+          "min": 0.7320607360342232,
+          "max": 0.7499830110782622
+        }
+      },
+      "e2e_p95": {
+        "aggregate": {
+          "last": 0.9717208561305808,
+          "mean": 0.9733591536796556,
+          "min": 0.9717208561305808,
+          "max": 0.9749974512287305
+        }
+      },
+      "e2e_avg": {
+        "aggregate": {
+          "last": 0.7988200364194114,
+          "mean": 0.7995757896029823,
+          "min": 0.7988200364194114,
+          "max": 0.800331542786553
+        }
+      }
+    },
+    "epp": {
+      "epp_ready": {
+        "qwen-kserve-router-scheduler-66c5757698-t7wps": {
+          "last": 2.0,
+          "mean": 2.0,
+          "min": 2.0,
+          "max": 2.0
+        }
+      },
+      "epp_queue": {
+        "qwen-kserve-router-scheduler-66c5757698-t7wps": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "epp_kv": {
+        "qwen-kserve-router-scheduler-66c5757698-t7wps": {
+          "last": 0.01,
+          "mean": 0.006666666666666667,
+          "min": 0.0,
+          "max": 0.01
+        }
+      },
+      "epp_per_pod_queue": {
+        "qwen-kserve-router-scheduler-66c5757698-t7wps": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      }
+    }
+  },
+  "01a-prefix-cache-routing": {
+    "window": {
+      "start": "2026-09-08 15:29:35",
+      "end": "2026-09-08 15:31:35"
+    },
+    "vllm": {
+      "ttft_p50": {
+        "aggregate": {
+          "last": 0.04973537967189773,
+          "mean": 0.04975169079895244,
+          "min": 0.04970909090909091,
+          "max": 0.049847328244274805
+        }
+      },
+      "ttft_p95": {
+        "aggregate": {
+          "last": 0.059004461190324195,
+          "mean": 0.059044303503185167,
+          "min": 0.059004461190324195,
+          "max": 0.05912213740458015
+        }
+      },
+      "ttft_p99": {
+        "aggregate": {
+          "last": 0.05982837954751766,
+          "mean": 0.05987031352133919,
+          "min": 0.05982837954751766,
+          "max": 0.059946564885496184
+        }
+      },
+      "kv_hit_rate": {
+        "aggregate": {
+          "last": 0.9684979371383919,
+          "mean": 0.9665365660871013,
+          "min": 0.9629699808761865,
+          "max": 0.9684979371383919
+        }
+      },
+      "per_pod_hit_rate": {
+        "qwen-kserve-7cbd77f7b6-l7q7t": {
+          "last": 0.9684979371383919,
+          "mean": 0.9665365660871013,
+          "min": 0.9629699808761865,
+          "max": 0.9684979371383919
+        }
+      },
+      "gpu_cache": {
+        "qwen-kserve-7cbd77f7b6-l7q7t": {
+          "last": 1.1010362694300557,
+          "mean": 0.8793897524467486,
+          "min": 0.0,
+          "max": 1.1010362694300557
+        },
+        "qwen-kserve-7cbd77f7b6-4szkw": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "req_throughput": {
+        "aggregate": {
+          "last": 4.962416666666667,
+          "mean": 2.443056926916221,
+          "min": 0.0,
+          "max": 4.962416666666667
+        }
+      },
+      "per_pod_throughput": {
+        "qwen-kserve-7cbd77f7b6-l7q7t": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "qwen-kserve-7cbd77f7b6-4szkw": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "queue_running": {
+        "aggregate": {
+          "last": 4.0,
+          "mean": 3.2,
+          "min": 0.0,
+          "max": 4.0
+        }
+      },
+      "queue_waiting": {
+        "aggregate": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "prompt_tps": {
+        "aggregate": {
+          "last": 10546.028250000001,
+          "mean": 5215.162508663101,
+          "min": 0.0,
+          "max": 10546.028250000001
+        }
+      },
+      "gen_tps": {
+        "aggregate": {
+          "last": 249.02916666666667,
+          "mean": 122.89637898395722,
+          "min": 0.0,
+          "max": 249.02916666666667
+        }
+      },
+      "e2e_p50": {
+        "aggregate": {
+          "last": 0.9,
+          "mean": 0.9,
+          "min": 0.9,
+          "max": 0.9
+        }
+      },
+      "e2e_p95": {
+        "aggregate": {
+          "last": 0.99,
+          "mean": 0.99,
+          "min": 0.99,
+          "max": 0.99
+        }
+      },
+      "e2e_avg": {
+        "aggregate": {
+          "last": 0.8185535429687861,
+          "mean": 0.8188688696934618,
+          "min": 0.8185535429687861,
+          "max": 0.8194950518717292
+        }
+      }
+    },
+    "epp": {
+      "epp_ready": {
+        "qwen-kserve-router-scheduler-5d99c88d88-nxmwx": {
+          "last": 2.0,
+          "mean": 2.0,
+          "min": 2.0,
+          "max": 2.0
+        }
+      },
+      "epp_queue": {
+        "qwen-kserve-router-scheduler-5d99c88d88-nxmwx": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "epp_kv": {
+        "qwen-kserve-router-scheduler-5d99c88d88-nxmwx": {
+          "last": 0.01,
+          "mean": 0.008,
+          "min": 0.0,
+          "max": 0.01
+        }
+      },
+      "epp_per_pod_queue": {
+        "qwen-kserve-router-scheduler-5d99c88d88-nxmwx": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      }
+    }
+  },
+  "01b-precise-prefix-cache-routing": {
+    "window": {
+      "start": "2026-09-08 15:44:04",
+      "end": "2026-09-08 15:46:04"
+    },
+    "vllm": {
+      "ttft_p50": {
+        "aggregate": {
+          "last": 0.04435292516703567,
+          "mean": 0.0444643521375461,
+          "min": 0.044347826086956525,
+          "max": 0.044651162790697675
+        }
+      },
+      "ttft_p95": {
+        "aggregate": {
+          "last": 0.058578571258990304,
+          "mean": 0.05876170762413752,
+          "min": 0.058578571258990304,
+          "max": 0.05909132395473131
+        }
+      },
+      "ttft_p99": {
+        "aggregate": {
+          "last": 0.05984307313383072,
+          "mean": 0.10158052182703387,
+          "min": 0.05984307313383072,
+          "max": 0.18082089987744837
+        }
+      },
+      "kv_hit_rate": {
+        "aggregate": {
+          "last": 0.9668564725748187,
+          "mean": 0.9630245184497175,
+          "min": 0.9560960874370963,
+          "max": 0.9668564725748187
+        }
+      },
+      "per_pod_hit_rate": {
+        "qwen-kserve-7cbd77f7b6-ssrt6": {
+          "last": 0.9668452102832069,
+          "mean": 0.9629531523110497,
+          "min": 0.9558893192520969,
+          "max": 0.9668452102832069
+        },
+        "qwen-kserve-7cbd77f7b6-gr5vk": {
+          "last": 0.9668676585119109,
+          "mean": 0.9630941799409493,
+          "min": 0.956296947959667,
+          "max": 0.9668676585119109
+        }
+      },
+      "gpu_cache": {
+        "qwen-kserve-7cbd77f7b6-ssrt6": {
+          "last": 0.9715025906735786,
+          "mean": 0.7772020725388629,
+          "min": 0.0,
+          "max": 0.9715025906735786
+        },
+        "qwen-kserve-7cbd77f7b6-gr5vk": {
+          "last": 0.9574544669210261,
+          "mean": 0.7659635735368209,
+          "min": 0.0,
+          "max": 0.9574544669210261
+        }
+      },
+      "req_throughput": {
+        "aggregate": {
+          "last": 4.947740507246376,
+          "mean": 2.445931717358366,
+          "min": 0.0,
+          "max": 4.947740507246376
+        }
+      },
+      "per_pod_throughput": {
+        "qwen-kserve-7cbd77f7b6-ssrt6": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "qwen-kserve-7cbd77f7b6-gr5vk": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "queue_running": {
+        "aggregate": {
+          "last": 2.0,
+          "mean": 1.6,
+          "min": 0.0,
+          "max": 2.0
+        }
+      },
+      "queue_waiting": {
+        "aggregate": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "prompt_tps": {
+        "aggregate": {
+          "last": 10479.690992826087,
+          "mean": 5191.926612548172,
+          "min": 0.0,
+          "max": 10479.690992826087
+        }
+      },
+      "gen_tps": {
+        "aggregate": {
+          "last": 247.7327344202899,
+          "mean": 122.58635264201253,
+          "min": 0.0,
+          "max": 247.7327344202899
+        }
+      },
+      "e2e_p50": {
+        "aggregate": {
+          "last": 0.6793368294055432,
+          "mean": 0.677893533147564,
+          "min": 0.6743778078024091,
+          "max": 0.6820683175864026
+        }
+      },
+      "e2e_p95": {
+        "aggregate": {
+          "last": 0.9388697302880119,
+          "mean": 0.9356009489496196,
+          "min": 0.9284686263769882,
+          "max": 0.9432248613929151
+        }
+      },
+      "e2e_avg": {
+        "aggregate": {
+          "last": 0.7932435011415343,
+          "mean": 0.7939855288661563,
+          "min": 0.7932435011415343,
+          "max": 0.7956465895586223
+        }
+      }
+    },
+    "epp": {
+      "epp_ready": {
+        "qwen-kserve-router-scheduler-9dc4cf655-nvrm9": {
+          "last": 2.0,
+          "mean": 2.0,
+          "min": 2.0,
+          "max": 2.0
+        }
+      },
+      "epp_queue": {
+        "qwen-kserve-router-scheduler-9dc4cf655-nvrm9": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "epp_kv": {
+        "qwen-kserve-router-scheduler-9dc4cf655-nvrm9": {
+          "last": 0.01,
+          "mean": 0.008,
+          "min": 0.0,
+          "max": 0.01
+        }
+      },
+      "epp_per_pod_queue": {
+        "qwen-kserve-router-scheduler-9dc4cf655-nvrm9": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      }
+    }
+  },
+  "01c-queue-kv-scheduling": {
+    "window": {
+      "start": "2026-09-08 15:32:03",
+      "end": "2026-09-08 15:34:03"
+    },
+    "vllm": {
+      "ttft_p50": {
+        "aggregate": {
+          "last": 0.17376627827278956,
+          "mean": 0.1445066114241254,
+          "min": 0.04972027972027972,
+          "max": 0.1739540964555491
+        }
+      },
+      "ttft_p95": {
+        "aggregate": {
+          "last": 0.24237662782727895,
+          "mean": 0.2058904662123729,
+          "min": 0.05897202797202797,
+          "max": 0.24298373038930854
+        }
+      },
+      "ttft_p99": {
+        "aggregate": {
+          "last": 0.2484753255654558,
+          "mean": 0.21164448127400987,
+          "min": 0.05979440559440559,
+          "max": 0.2514999999999983
+        }
+      },
+      "kv_hit_rate": {
+        "aggregate": {
+          "last": 0.9725930620249839,
+          "mean": 0.9731928521414543,
+          "min": 0.9685420872050451,
+          "max": 0.9772054106474349
+        }
+      },
+      "per_pod_hit_rate": {
+        "qwen-kserve-7cbd77f7b6-l7q7t": {
+          "last": 0.9725930620249839,
+          "mean": 0.9731928521414543,
+          "min": 0.9685420872050451,
+          "max": 0.9772054106474349
+        }
+      },
+      "gpu_cache": {
+        "qwen-kserve-7cbd77f7b6-l7q7t": {
+          "last": 4.145077720207258,
+          "mean": 3.4484743811168714,
+          "min": 0.0,
+          "max": 4.533678756476689
+        },
+        "qwen-kserve-7cbd77f7b6-4szkw": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "req_throughput": {
+        "aggregate": {
+          "last": 38.63478260869565,
+          "mean": 21.23130434782609,
+          "min": 3.869565217391304,
+          "max": 38.63478260869565
+        }
+      },
+      "per_pod_throughput": {
+        "qwen-kserve-7cbd77f7b6-l7q7t": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "qwen-kserve-7cbd77f7b6-4szkw": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "queue_running": {
+        "aggregate": {
+          "last": 76.0,
+          "mean": 63.2,
+          "min": 0.0,
+          "max": 80.0
+        }
+      },
+      "queue_waiting": {
+        "aggregate": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "prompt_tps": {
+        "aggregate": {
+          "last": 81668.1652173913,
+          "mean": 45678.36869565217,
+          "min": 8095.226086956522,
+          "max": 81668.1652173913
+        }
+      },
+      "gen_tps": {
+        "aggregate": {
+          "last": 1923.6521739130435,
+          "mean": 1069.4713043478262,
+          "min": 192.52173913043478,
+          "max": 1923.6521739130435
+        }
+      },
+      "e2e_p50": {
+        "aggregate": {
+          "last": 2.1056975505857296,
+          "mean": 1.709517327723741,
+          "min": 0.9,
+          "max": 2.1056975505857296
+        }
+      },
+      "e2e_p95": {
+        "aggregate": {
+          "last": 2.460569755058573,
+          "mean": 2.1247067712535426,
+          "min": 0.99,
+          "max": 2.460569755058573
+        }
+      },
+      "e2e_avg": {
+        "aggregate": {
+          "last": 2.0445276429302757,
+          "mean": 1.6796915411140059,
+          "min": 0.8181272554933355,
+          "max": 2.0445276429302757
+        }
+      }
+    },
+    "epp": {
+      "epp_ready": {
+        "qwen-kserve-router-scheduler-5d99c88d88-nxmwx": {
+          "last": 2.0,
+          "mean": 2.0,
+          "min": 2.0,
+          "max": 2.0
+        }
+      },
+      "epp_queue": {
+        "qwen-kserve-router-scheduler-5d99c88d88-nxmwx": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "epp_kv": {
+        "qwen-kserve-router-scheduler-5d99c88d88-nxmwx": {
+          "last": 0.02,
+          "mean": 0.016,
+          "min": 0.0,
+          "max": 0.02
+        }
+      },
+      "epp_per_pod_queue": {
+        "qwen-kserve-router-scheduler-5d99c88d88-nxmwx": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      }
+    }
+  },
+  "01d-round-robin-control": {
+    "window": {
+      "start": "2026-09-08 15:38:13",
+      "end": "2026-09-08 15:40:13"
+    },
+    "vllm": {
+      "ttft_p50": {
+        "aggregate": {
+          "last": 0.04789165247871432,
+          "mean": 0.0481287847626108,
+          "min": 0.04789165247871432,
+          "max": 0.04844356428095775
+        }
+      },
+      "ttft_p95": {
+        "aggregate": {
+          "last": 0.05917077689947001,
+          "mean": 0.05924116971831547,
+          "min": 0.05917077689947001,
+          "max": 0.05930921540886496
+        }
+      },
+      "ttft_p99": {
+        "aggregate": {
+          "last": 0.07020590179210862,
+          "mean": 0.09068509511688293,
+          "min": 0.07020590179210862,
+          "max": 0.1450171573406128
+        }
+      },
+      "kv_hit_rate": {
+        "aggregate": {
+          "last": 0.966862075039067,
+          "mean": 0.9630869962411907,
+          "min": 0.956296947959667,
+          "max": 0.966862075039067
+        }
+      },
+      "per_pod_hit_rate": {
+        "qwen-kserve-6cccd699cd-bvl24": {
+          "last": 0.9668676585119109,
+          "mean": 0.9632706806156612,
+          "min": 0.9566819306279278,
+          "max": 0.9668676585119109
+        },
+        "qwen-kserve-6cccd699cd-nbrzm": {
+          "last": 0.9668564725748187,
+          "mean": 0.9628916357415478,
+          "min": 0.9558893192520969,
+          "max": 0.9668564725748187
+        }
+      },
+      "gpu_cache": {
+        "qwen-kserve-6cccd699cd-bvl24": {
+          "last": 0.0,
+          "mean": 0.59873344847438,
+          "min": 0.0,
+          "max": 1.0578583765112226
+        },
+        "qwen-kserve-6cccd699cd-nbrzm": {
+          "last": 1.0294435245842615,
+          "mean": 0.8077172269814991,
+          "min": 0.0,
+          "max": 1.0366424303505872
+        }
+      },
+      "req_throughput": {
+        "aggregate": {
+          "last": 4.931792463768117,
+          "mean": 2.4374799086266394,
+          "min": 0.0,
+          "max": 4.931792463768117
+        }
+      },
+      "per_pod_throughput": {
+        "qwen-kserve-6cccd699cd-bvl24": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "qwen-kserve-6cccd699cd-nbrzm": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "queue_running": {
+        "aggregate": {
+          "last": 3.0,
+          "mean": 2.8,
+          "min": 0.0,
+          "max": 4.0
+        }
+      },
+      "queue_waiting": {
+        "aggregate": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "prompt_tps": {
+        "aggregate": {
+          "last": 10463.869659710144,
+          "mean": 5195.463796719807,
+          "min": 0.0,
+          "max": 10463.869659710144
+        }
+      },
+      "gen_tps": {
+        "aggregate": {
+          "last": 246.917255,
+          "mean": 122.44685503492065,
+          "min": 0.0,
+          "max": 246.917255
+        }
+      },
+      "e2e_p50": {
+        "aggregate": {
+          "last": 0.8296090920634718,
+          "mean": 0.8321823849912251,
+          "min": 0.8296090920634718,
+          "max": 0.8398302509417108
+        }
+      },
+      "e2e_p95": {
+        "aggregate": {
+          "last": 0.9829609092063472,
+          "mean": 0.9832182384991225,
+          "min": 0.9829609092063472,
+          "max": 0.983983025094171
+        }
+      },
+      "e2e_avg": {
+        "aggregate": {
+          "last": 0.8013686935034303,
+          "mean": 0.8020034867856631,
+          "min": 0.8013686935034303,
+          "max": 0.8033500636420888
+        }
+      }
+    },
+    "epp": {
+      "epp_ready": {
+        "qwen-kserve-router-scheduler-55d59785-wwjhn": {
+          "last": 2.0,
+          "mean": 2.0,
+          "min": 2.0,
+          "max": 2.0
+        }
+      },
+      "epp_queue": {
+        "qwen-kserve-router-scheduler-55d59785-wwjhn": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "epp_kv": {
+        "qwen-kserve-router-scheduler-55d59785-wwjhn": {
+          "last": 0.01,
+          "mean": 0.008,
+          "min": 0.0,
+          "max": 0.01
+        }
+      },
+      "epp_per_pod_queue": {
+        "qwen-kserve-router-scheduler-55d59785-wwjhn": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      }
+    }
+  },
+  "02a-global-cache-indexing": {
+    "window": {
+      "start": "2026-09-05 15:09:30",
+      "end": "2026-09-05 15:40:24"
+    },
+    "vllm": {
+      "ttft_p50": {
+        "aggregate": {
+          "last": 0.26997784971886185,
+          "mean": 0.14385339636478453,
+          "min": 0.03367924528301887,
+          "max": 0.388372081623347
+        }
+      },
+      "ttft_p95": {
+        "aggregate": {
+          "last": 0.7072535211267604,
+          "mean": 0.4991667365446907,
+          "min": 0.05890059523809523,
+          "max": 3.8334147522905555
+        }
+      },
+      "ttft_p99": {
+        "aggregate": {
+          "last": 1.9576098901098886,
+          "mean": 1.1458847688840799,
+          "min": 0.05978011904761904,
+          "max": 4.822939815605865
+        }
+      },
+      "kv_hit_rate": {
+        "aggregate": {
+          "last": 0.9340353573386458,
+          "mean": 0.8742516230796434,
+          "min": 0.14273368459201025,
+          "max": 0.9340353573386458
+        }
+      },
+      "per_pod_hit_rate": {
+        "qwen-kserve-7cbd77f7b6-mrvmw": {
+          "last": 0.933991227273854,
+          "mean": 0.8713102310545984,
+          "min": 0.05541425401807457,
+          "max": 0.933991227273854
+        },
+        "qwen-kserve-7cbd77f7b6-v94w2": {
+          "last": 0.9340791813050282,
+          "mean": 0.8772555850109892,
+          "min": 0.23551057957681693,
+          "max": 0.9340791813050282
+        }
+      },
+      "gpu_cache": {
+        "qwen-kserve-7cbd77f7b6-mrvmw": {
+          "last": 28.89320667818077,
+          "mean": 15.856732965624825,
+          "min": 0.0,
+          "max": 34.578295912492806
+        },
+        "qwen-kserve-7cbd77f7b6-v94w2": {
+          "last": 28.810020876826727,
+          "mean": 15.308357000703634,
+          "min": 0.0,
+          "max": 34.072420992009214
+        }
+      },
+      "req_throughput": {
+        "aggregate": {
+          "last": 122.35652173913044,
+          "mean": 59.32838524777934,
+          "min": 0.0,
+          "max": 124.10434782608695
+        }
+      },
+      "per_pod_throughput": {
+        "qwen-kserve-7cbd77f7b6-mrvmw": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "qwen-kserve-7cbd77f7b6-v94w2": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "queue_running": {
+        "aggregate": {
+          "last": 314.0,
+          "mean": 151.3548387096774,
+          "min": 0.0,
+          "max": 506.0
+        }
+      },
+      "queue_waiting": {
+        "aggregate": {
+          "last": 0.0,
+          "mean": 5.032258064516129,
+          "min": 0.0,
+          "max": 69.0
+        }
+      },
+      "prompt_tps": {
+        "aggregate": {
+          "last": 131971.25217391306,
+          "mean": 65234.18654168537,
+          "min": 0.0,
+          "max": 133067.70434782607
+        }
+      },
+      "gen_tps": {
+        "aggregate": {
+          "last": 6115.756521739131,
+          "mean": 2979.064487788686,
+          "min": 0.0,
+          "max": 6122.278260869565
+        }
+      },
+      "e2e_p50": {
+        "aggregate": {
+          "last": 3.516638898632059,
+          "mean": 1.8300253209099444,
+          "min": 0.7071428571428572,
+          "max": 4.038131816239316
+        }
+      },
+      "e2e_p95": {
+        "aggregate": {
+          "last": 4.904737372851631,
+          "mean": 3.056622778550546,
+          "min": 0.96375,
+          "max": 8.833087692491581
+        }
+      },
+      "e2e_avg": {
+        "aggregate": {
+          "last": 3.3292416905926436,
+          "mean": 1.9144277371229736,
+          "min": 0.773688766874116,
+          "max": 4.070716440489727
+        }
+      }
+    },
+    "epp": {
+      "epp_ready": {
+        "qwen-kserve-router-scheduler-6dcbb8dbc-2vdjr": {
+          "last": 2.0,
+          "mean": 2.0,
+          "min": 2.0,
+          "max": 2.0
+        }
+      },
+      "epp_queue": {
+        "qwen-kserve-router-scheduler-6dcbb8dbc-2vdjr": {
+          "last": 0.0,
+          "mean": 0.4032258064516129,
+          "min": 0.0,
+          "max": 12.0
+        }
+      },
+      "epp_kv": {
+        "qwen-kserve-router-scheduler-6dcbb8dbc-2vdjr": {
+          "last": 0.27,
+          "mean": 0.14758064516129032,
+          "min": 0.0,
+          "max": 0.34
+        }
+      },
+      "epp_per_pod_queue": {
+        "qwen-kserve-router-scheduler-6dcbb8dbc-2vdjr": {
+          "last": 0.0,
+          "mean": 3.161290322580645,
+          "min": 0.0,
+          "max": 86.0
+        }
+      }
+    }
+  },
+  "03a-pd-separation": {
+    "window": {
+      "start": "2026-09-05 17:23:25",
+      "end": "2026-09-05 17:44:40"
+    },
+    "vllm": {},
+    "epp": {
+      "epp_ready": {
+        "qwen-pd-kserve-router-scheduler-867d8fbfd4-rchvq": {
+          "last": 2.0,
+          "mean": 2.0,
+          "min": 2.0,
+          "max": 2.0
+        }
+      },
+      "epp_queue": {
+        "qwen-pd-kserve-router-scheduler-867d8fbfd4-rchvq": {
+          "last": 0.0,
+          "mean": 17.209302325581394,
+          "min": 0.0,
+          "max": 200.0
+        }
+      },
+      "epp_kv": {
+        "qwen-pd-kserve-router-scheduler-867d8fbfd4-rchvq": {
+          "last": 0.02,
+          "mean": 0.05186046511627907,
+          "min": 0.0,
+          "max": 0.5
+        }
+      },
+      "epp_per_pod_queue": {
+        "qwen-pd-kserve-router-scheduler-867d8fbfd4-rchvq": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      }
+    }
+  },
+  "03b-pd-kv-transfer": {
+    "window": {
+      "start": "2026-09-05 19:32:42",
+      "end": "2026-09-05 19:34:42"
+    },
+    "vllm": {},
+    "epp": {
+      "epp_ready": {
+        "qwen-pd-kserve-router-scheduler-867d8fbfd4-rchvq": {
+          "last": 2.0,
+          "mean": 2.0,
+          "min": 2.0,
+          "max": 2.0
+        }
+      },
+      "epp_queue": {
+        "qwen-pd-kserve-router-scheduler-867d8fbfd4-rchvq": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "epp_kv": {
+        "qwen-pd-kserve-router-scheduler-867d8fbfd4-rchvq": {
+          "last": 0.14,
+          "mean": 0.138,
+          "min": 0.0,
+          "max": 0.2
+        }
+      },
+      "epp_per_pod_queue": {
+        "qwen-pd-kserve-router-scheduler-867d8fbfd4-rchvq": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      }
+    }
+  },
+  "03c-heterogeneous-pd": {
+    "window": {
+      "start": "2026-09-08 16:39:08",
+      "end": "2026-09-08 17:09:38"
+    },
+    "vllm": {},
+    "epp": {
+      "epp_ready": {
+        "qwen-pd-kserve-router-scheduler-6cb6f44879-g4mwj": {
+          "last": 2.0,
+          "mean": 2.0,
+          "min": 2.0,
+          "max": 2.0
+        }
+      },
+      "epp_queue": {
+        "qwen-pd-kserve-router-scheduler-6cb6f44879-g4mwj": {
+          "last": 123.5,
+          "mean": 28.741935483870968,
+          "min": 0.0,
+          "max": 128.0
+        }
+      },
+      "epp_kv": {
+        "qwen-pd-kserve-router-scheduler-6cb6f44879-g4mwj": {
+          "last": 0.27,
+          "mean": 0.10741935483870968,
+          "min": 0.0,
+          "max": 0.28
+        }
+      },
+      "epp_per_pod_queue": {
+        "qwen-pd-kserve-router-scheduler-6cb6f44879-g4mwj": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      }
+    }
+  },
+  "04a-data-parallelism": {
+    "window": {
+      "start": "2026-09-08 17:25:07",
+      "end": "2026-09-08 17:27:07"
+    },
+    "vllm": {
+      "ttft_p50": {
+        "aggregate": {
+          "last": 0.06298100133850797,
+          "mean": 0.06335738428472179,
+          "min": 0.06189185704584334,
+          "max": 0.06479399793069507
+        }
+      },
+      "ttft_p95": {
+        "aggregate": {
+          "last": 0.2063117059098615,
+          "mean": 0.20872488257362548,
+          "min": 0.20513926276430505,
+          "max": 0.21280783994715308
+        }
+      },
+      "ttft_p99": {
+        "aggregate": {
+          "last": 0.24126234118197235,
+          "mean": 0.2417449765147251,
+          "min": 0.24102785255286102,
+          "max": 0.24256156798943063
+        }
+      },
+      "kv_hit_rate": {
+        "aggregate": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "per_pod_hit_rate": {
+        "qwen-kserve-6cccd699cd-9ggqq": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "qwen-kserve-6cccd699cd-dkzr8": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "qwen-kserve-6cccd699cd-52j9h": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "gpu_cache": {
+        "qwen-kserve-6cccd699cd-9ggqq": {
+          "last": 1.2953367875647714,
+          "mean": 0.9758203799654573,
+          "min": 0.0,
+          "max": 1.6191709844559532
+        },
+        "qwen-kserve-6cccd699cd-dkzr8": {
+          "last": 0.6476683937823857,
+          "mean": 0.5987334484743823,
+          "min": 0.0,
+          "max": 1.2305699481865329
+        },
+        "qwen-kserve-6cccd699cd-52j9h": {
+          "last": 0.8710675977251503,
+          "mean": 0.64214239435606,
+          "min": 0.0,
+          "max": 1.015045713051621
+        }
+      },
+      "req_throughput": {
+        "aggregate": {
+          "last": 44.95363847826087,
+          "mean": 22.25628717763291,
+          "min": 0.0,
+          "max": 44.95363847826087
+        }
+      },
+      "per_pod_throughput": {
+        "qwen-kserve-6cccd699cd-9ggqq": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "qwen-kserve-6cccd699cd-dkzr8": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "qwen-kserve-6cccd699cd-52j9h": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "queue_running": {
+        "aggregate": {
+          "last": 42.0,
+          "mean": 36.4,
+          "min": 0.0,
+          "max": 57.0
+        }
+      },
+      "queue_waiting": {
+        "aggregate": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "prompt_tps": {
+        "aggregate": {
+          "last": 4873.406806956522,
+          "mean": 2428.5585147716192,
+          "min": 0.0,
+          "max": 4873.406806956522
+        }
+      },
+      "gen_tps": {
+        "aggregate": {
+          "last": 2258.453876594203,
+          "mean": 1119.3229581213243,
+          "min": 0.0,
+          "max": 2258.453876594203
+        }
+      },
+      "e2e_p50": {
+        "aggregate": {
+          "last": 0.8882954815143301,
+          "mean": 0.8859349836132322,
+          "min": 0.8835122478563491,
+          "max": 0.8882954815143301
+        }
+      },
+      "e2e_p95": {
+        "aggregate": {
+          "last": 0.9888295481514331,
+          "mean": 0.9885934983613232,
+          "min": 0.9883512247856349,
+          "max": 0.9888295481514331
+        }
+      },
+      "e2e_avg": {
+        "aggregate": {
+          "last": 0.8584323191710294,
+          "mean": 0.8592184023963607,
+          "min": 0.8574953753806813,
+          "max": 0.8627387271658228
+        }
+      }
+    },
+    "epp": {
+      "epp_ready": {
+        "qwen-kserve-router-scheduler-6dcbb8dbc-9zwbv": {
+          "last": 3.0,
+          "mean": 3.0,
+          "min": 3.0,
+          "max": 3.0
+        }
+      },
+      "epp_queue": {
+        "qwen-kserve-router-scheduler-6dcbb8dbc-9zwbv": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      },
+      "epp_kv": {
+        "qwen-kserve-router-scheduler-6dcbb8dbc-9zwbv": {
+          "last": 0.01,
+          "mean": 0.008,
+          "min": 0.0,
+          "max": 0.01
+        }
+      },
+      "epp_per_pod_queue": {
+        "qwen-kserve-router-scheduler-6dcbb8dbc-9zwbv": {
+          "last": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      }
+    }
+  }
+}
